@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everwell Medical Clinic — Pharmacist Dashboard</title>
+<meta name="description" content="Everwell role-specific dashboards for Front Desk, Nurse, Doctor, Pharmacist, and Billing Staff.">
+<meta name="theme-color" content="#16211A">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg: #F1F3EC;
+--bg-soft: #E7ECE1;
+--cream: #FAF8F3;
+--ink: #1E2A22;
+--ink-soft: #4A554C;
+--sage: #4F6B57;
+--sage-light: #8AA491;
+--sage-deep: #16211A;
+--clay: #DCCAB3;
+--gold: #B99B67;
+--line: rgba(30,42,34,0.12);
+--radius-sm: 8px;
+--radius-md: 18px;
+--radius-lg: 22px;
+--radius-xl: 100px;
+--transition-fast: 0.2s ease;
+--transition-med: 0.35s ease;
+--shadow-sm: 0 2px 8px rgba(22,33,26,0.06);
+--shadow-md: 0 8px 24px rgba(22,33,26,0.1);
+--shadow-lg: 0 16px 48px rgba(22,33,26,0.14);
+--focus-ring: 0 0 0 3px rgba(79,107,87,0.45);
+--danger: #8B2E2E;
+--danger-light: #C25A5A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+[id]{scroll-margin-top:80px;}
+body{
+background:var(--bg);
+color:var(--ink);
+font-family:'Instrument Sans',sans-serif;
+font-weight:400;
+min-height:100vh;
+}
+a{color:inherit;text-decoration:none;}
+
+/* NAV */
+.admin-nav{
+position:fixed;top:0;left:0;width:100%;z-index:100;
+background:var(--sage-deep);
+display:flex;align-items:center;justify-content:space-between;
+padding:1.2rem 4vw;
+height:60px;
+}
+.nav-left{display:flex;align-items:center;gap:2rem;}
+.nav-mark{
+font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;
+letter-spacing:-0.015em;color:var(--cream);
+}
+.nav-mark em{font-style:italic;font-weight:400;color:var(--sage-light);}
+.nav-brand-sep{width:1px;height:20px;background:rgba(250,248,243,0.2);}
+.nav-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:500;}
+.nav-right{display:flex;align-items:center;gap:1.2rem;}
+.nav-home{
+font-size:0.82rem;color:rgba(250,248,243,0.7);
+transition:color .3s;
+}
+.nav-home:hover{color:var(--cream);}
+.nav-home svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.nav-avatar{
+width:32px;height:32px;border-radius:50%;
+background:var(--sage);color:var(--cream);
+display:flex;align-items:center;justify-content:center;
+font-size:0.78rem;font-weight:500;
+cursor:pointer;
+}
+.nav-logout{
+font-size:0.82rem;color:rgba(250,248,243,0.5);
+transition:color .3s;
+}
+.nav-logout:hover{color:var(--cream);}
+
+
+/* LAYOUT */
+.admin-body{
+display:flex;
+padding-top:60px;
+min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+width:240px;
+background:var(--cream);
+border-right:1px solid var(--line);
+position:fixed;top:60px;bottom:0;left:0;
+padding:1rem 0;
+overflow-y:auto;
+z-index:50;
+}
+.sidebar-section{margin-bottom:1.6rem;}
+.sidebar-label{
+font-size:0.68rem;letter-spacing:0.16em;text-transform:uppercase;
+color:var(--ink-soft);opacity:0.55;font-weight:500;
+padding:0 1.2rem;margin-bottom:0.6rem;
+}
+.sidebar-link{
+display:flex;align-items:center;gap:0.75rem;
+padding:0.6rem 1.2rem;
+font-size:0.85rem;color:var(--ink-soft);
+transition:color .3s, background .3s;
+border-left:2px solid transparent;
+}
+.sidebar-link:hover{color:var(--sage-deep);background:rgba(30,42,34,0.03);}
+.sidebar-link.active{
+color:var(--sage-deep);font-weight:500;
+background:rgba(79,107,87,0.08);
+border-left-color:var(--sage);
+}
+.sidebar-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.sidebar-badge{
+margin-left:auto;
+font-size:0.68rem;font-weight:600;
+background:var(--sage-deep);color:var(--cream);
+padding:0.15rem 0.5rem;border-radius:100px;
+}
+
+/* MAIN CONTENT */
+.admin-main{
+margin-left:240px;flex:1;
+padding:2rem 2.4rem;
+}
+
+/* DASHBOARD PANELS */
+.dashboard-panel{display:none;}
+.dashboard-panel.active{display:block;}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:2rem;}
+.page-header h1{
+font-family:'Fraunces',serif;font-weight:400;
+font-size:1.8rem;color:var(--sage-deep);letter-spacing:-0.01em;
+}
+.page-header p{font-size:0.88rem;color:var(--ink-soft);margin-top:0.3rem;}
+
+/* STAT CARDS */
+.stats-row{
+display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;
+margin-bottom:2.4rem;
+}
+.stat-card{
+background:var(--cream);
+border:1px solid var(--line);
+border-radius:var(--radius-md);
+padding:1.4rem;
+}
+.stat-card .stat-icon{
+width:36px;height:36px;border-radius:50%;
+background:var(--bg-soft);
+display:flex;align-items:center;justify-content:center;
+margin-bottom:0.8rem;
+}
+.stat-card .stat-icon svg{width:18px;height:18px;stroke:var(--sage);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.stat-card .stat-value{
+font-family:'Fraunces',serif;font-size:1.8rem;color:var(--sage-deep);
+}
+.stat-card .stat-label{
+font-size:0.78rem;color:var(--ink-soft);margin-top:0.2rem;
+}
+.stat-card .stat-change{
+font-size:0.72rem;margin-top:0.4rem;
+}
+.stat-card .stat-change.up{color:var(--sage);}
+.stat-card .stat-change.down{color:var(--danger-light);}
+
+/* CARDS */
+.card{
+background:var(--cream);
+border:1px solid var(--line);
+border-radius:var(--radius-md);
+padding:1.6rem;
+margin-bottom:1.6rem;
+}
+.card-header{
+display:flex;align-items:center;justify-content:space-between;
+margin-bottom:1.2rem;
+}
+.card-header h3{
+font-family:'Fraunces',serif;font-weight:500;font-size:1.08rem;color:var(--sage-deep);
+}
+.card-header .card-action{
+font-size:0.8rem;color:var(--sage);transition:color .3s;
+}
+.card-header .card-action:hover{color:var(--sage-deep);}
+
+/* TABLE */
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{
+font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;
+color:var(--ink-soft);opacity:0.7;font-weight:500;
+text-align:left;padding:0.7rem 0.8rem;border-bottom:1px solid var(--line);
+}
+.admin-table td{
+padding:0.8rem 0.8rem;font-size:0.85rem;color:var(--ink);
+border-bottom:1px solid var(--line);
+}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:rgba(30,42,34,0.02);}
+
+/* STATUS PILLS */
+.status-pill{
+display:inline-block;font-size:0.72rem;font-weight:500;
+padding:0.2rem 0.6rem;border-radius:100px;
+}
+.status-pill.confirmed{background:rgba(79,107,87,0.1);color:var(--sage);}
+.status-pill.pending{background:rgba(185,155,103,0.15);color:var(--gold);}
+.status-pill.cancelled{background:rgba(139,46,46,0.1);color:var(--danger-light);}
+.status-pill.checked-in{background:rgba(79,107,87,0.1);color:var(--sage);}
+.status-pill.triage{background:rgba(185,155,103,0.15);color:var(--gold);}
+.status-pill.in-progress{background:rgba(139,46,46,0.1);color:var(--danger-light);}
+.status-pill.completed{background:rgba(79,107,87,0.1);color:var(--sage);}
+.status-pill.unpaid{background:rgba(139,46,46,0.1);color:var(--danger-light);}
+.status-pill.partial{background:rgba(185,155,103,0.15);color:var(--gold);}
+.status-pill.paid{background:rgba(79,107,87,0.1);color:var(--sage);}
+.status-pill.flagged{background:rgba(139,46,46,0.15);color:var(--danger);}
+.status-pill.validated{background:rgba(79,107,87,0.1);color:var(--sage);}
+
+/* ACTION BUTTONS */
+.action-btn{
+display:inline-flex;align-items:center;gap:0.35rem;
+padding:0.3rem 0.7rem;
+background:var(--sage);color:var(--cream);
+border:none;border-radius:var(--radius-sm);
+font-size:0.72rem;font-weight:500;cursor:pointer;
+transition:background .3s;
+}
+.action-btn:hover{background:var(--sage-deep);}
+.action-btn.outline{
+background:transparent;color:var(--sage);
+border:1px solid var(--sage);
+}
+.action-btn.outline:hover{background:rgba(79,107,87,0.08);}
+.action-btn.danger{background:var(--danger);}
+.action-btn.danger:hover{background:#6b2222;}
+.action-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* SEARCH BAR */
+.search-bar{
+display:flex;align-items:center;gap:0.6rem;
+padding:0.7rem 1rem;
+background:var(--cream);border:1px solid var(--line);
+border-radius:var(--radius-md);
+margin-bottom:1.6rem;
+}
+.search-bar input{
+border:none;outline:none;background:transparent;
+font-size:0.88rem;color:var(--ink);flex:1;
+font-family:'Instrument Sans',sans-serif;
+}
+.search-bar input::placeholder{color:var(--ink-soft);opacity:0.5;}
+.search-bar svg{width:18px;height:18px;stroke:var(--ink-soft);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* QUEUE BOARD */
+.queue-board{
+display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
+margin-bottom:1.6rem;
+}
+.queue-column{
+background:var(--cream);border:1px solid var(--line);
+border-radius:var(--radius-md);padding:1rem;
+}
+.queue-column h4{
+font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;
+color:var(--ink-soft);font-weight:500;margin-bottom:0.8rem;
+padding-bottom:0.5rem;border-bottom:1px solid var(--line);
+}
+.queue-card{
+padding:0.7rem 0.8rem;margin-bottom:0.5rem;
+background:var(--bg-soft);border-radius:var(--radius-sm);
+font-size:0.8rem;
+}
+.queue-card:last-child{margin-bottom:0;}
+.queue-card .qc-name{font-weight:500;color:var(--sage-deep);}
+.queue-card .qc-service{font-size:0.72rem;color:var(--ink-soft);margin-top:0.15rem;}
+.queue-card .qc-time{font-size:0.68rem;color:var(--ink-soft);opacity:0.6;margin-top:0.2rem;}
+
+/* ALLERGY BANNER */
+.allergy-banner{
+background:rgba(139,46,46,0.08);border:1px solid rgba(139,46,46,0.2);
+border-radius:var(--radius-sm);
+padding:0.8rem 1rem;margin-bottom:1rem;
+display:flex;align-items:center;gap:0.6rem;
+}
+.allergy-banner svg{width:16px;height:16px;stroke:var(--danger);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.allergy-banner span{font-size:0.82rem;color:var(--danger);}
+.allergy-banner strong{font-weight:600;}
+
+/* ALERT STRIP */
+.alert-strip{
+background:rgba(185,155,103,0.1);border:1px solid rgba(185,155,103,0.25);
+border-radius:var(--radius-sm);
+padding:0.8rem 1rem;margin-bottom:1rem;
+display:flex;align-items:center;gap:0.6rem;
+}
+.alert-strip svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.alert-strip span{font-size:0.82rem;color:var(--gold);}
+.alert-strip strong{font-weight:600;}
+
+/* GRID LAYOUT */
+.content-grid{
+display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;
+}
+.content-grid-3{
+display:grid;grid-template-columns:2fr 1fr;gap:1.6rem;
+}
+
+/* QUICK ACTIONS */
+.quick-actions{
+display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;
+}
+.quick-btn{
+display:flex;align-items:center;gap:0.6rem;
+padding:0.9rem 1rem;
+background:var(--bg-soft);
+border:1px solid var(--line);
+border-radius:var(--radius-sm);
+font-size:0.82rem;color:var(--ink);
+cursor:pointer;
+transition:background .3s, border-color .3s;
+}
+.quick-btn:hover{background:var(--cream);border-color:var(--sage-light);}
+.quick-btn svg{width:16px;height:16px;stroke:var(--sage);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* ACTIVITY */
+.activity-list{list-style:none;}
+.activity-item{
+display:flex;align-items:flex-start;gap:0.8rem;
+padding:0.7rem 0;
+border-bottom:1px solid var(--line);
+}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{
+width:8px;height:8px;border-radius:50%;
+background:var(--sage);flex-shrink:0;margin-top:0.35rem;
+}
+.activity-text{font-size:0.82rem;color:var(--ink);line-height:1.5;}
+.activity-time{font-size:0.72rem;color:var(--ink-soft);opacity:0.6;margin-top:0.15rem;}
+
+/* TOAST */
+.toast{
+position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+background:var(--sage-deep);color:var(--cream);
+padding:0.9rem 1.8rem;border-radius:var(--radius-xl);
+font-size:0.85rem;font-weight:500;
+box-shadow:var(--shadow-lg);
+opacity:0;pointer-events:none;
+transition:transform 0.4s ease, opacity 0.4s ease;
+z-index:200;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+.toast.error{background:#8B2E2E;}
+.toast.success{background:var(--sage);}
+
+/* FILTER BAR */
+.filter-bar{
+display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap;
+}
+.filter-btn{
+padding:0.35rem 0.8rem;border-radius:100px;
+font-size:0.75rem;font-weight:500;
+background:var(--bg-soft);color:var(--ink-soft);
+border:1px solid var(--line);cursor:pointer;
+transition:background .3s, color .3s;
+}
+.filter-btn.active{background:var(--sage-deep);color:var(--cream);border-color:var(--sage-deep);}
+.filter-btn:hover{border-color:var(--sage);}
+
+/* DRUG ALERT */
+.drug-alert{
+background:rgba(139,46,46,0.08);border:1px solid rgba(139,46,46,0.2);
+border-radius:var(--radius-sm);
+padding:0.9rem 1rem;margin-bottom:0.8rem;
+}
+.drug-alert h5{font-size:0.82rem;color:var(--danger);margin-bottom:0.3rem;font-weight:600;}
+.drug-alert p{font-size:0.78rem;color:var(--ink-soft);line-height:1.4;}
+
+/* COLLECTION BAR */
+.collection-bar{
+display:flex;align-items:center;gap:0.8rem;
+padding:1rem 1.2rem;background:var(--bg-soft);
+border-radius:var(--radius-sm);margin-bottom:0.8rem;
+}
+.collection-bar .cb-label{font-size:0.78rem;color:var(--ink-soft);min-width:120px;}
+.collection-bar .cb-amount{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--sage-deep);}
+
+/* MOBILE */
+@media(max-width:980px){
+.stats-row{grid-template-columns:repeat(2,1fr);}
+.content-grid,.content-grid-3{grid-template-columns:1fr;}
+.queue-board{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:760px){
+.sidebar{display:none;}
+.admin-main{margin-left:0;padding:1.4rem 1.2rem;}
+.stats-row{grid-template-columns:1fr 1fr;}
+.queue-board{grid-template-columns:1fr;}
+}
+
+/* ===== SPLASH / PRELOADER ===== */
+.preloader{
+position:fixed;inset:0;z-index:2000;
+background:var(--sage-deep);
+display:flex;align-items:center;justify-content:center;
+transition:transform .8s cubic-bezier(.65,0,.35,1);
+}
+.preloader-mark{
+font-family:'Fraunces',serif;font-size:2rem;color:var(--cream);
+letter-spacing:-0.01em;overflow:hidden;
+}
+.preloader-mark span{
+display:inline-block;
+opacity:0;
+transform:translateY(100%);
+animation:letterUp .6s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes letterUp{
+to{opacity:1;transform:translateY(0);}
+}
+.preloader.done{transform:translateY(-100%);}
+@media (prefers-reduced-motion: reduce){
+.preloader-mark span{animation-duration:.01ms !important;}
+}
+
+/* ===== FUNCTIONAL UI ADD-ONS ===== */
+.icon-btn{
+background:none;border:none;cursor:pointer;color:var(--ink-soft);
+padding:0.35rem;border-radius:6px;
+transition:color .2s, background .2s;
+display:inline-flex;
+}
+.icon-btn:hover{color:var(--sage-deep);background:rgba(30,42,34,0.06);}
+.icon-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.status-select{
+font-size:0.72rem;font-weight:500;border-radius:100px;
+padding:0.25rem 1.4rem 0.25rem 0.65rem;
+border:1px solid var(--line);cursor:pointer;
+appearance:none;-webkit-appearance:none;
+background-repeat:no-repeat;background-position:right 0.5rem center;background-size:9px;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A554C' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+.status-select.validated, .status-select.completed{background-color:rgba(79,107,87,0.1);color:var(--sage);}
+.status-select.pending{background-color:rgba(185,155,103,0.15);color:var(--gold);}
+.status-select.flagged{background-color:rgba(139,46,46,0.15);color:var(--danger);}
+.empty-state{padding:2rem 1rem;text-align:center;color:var(--ink-soft);font-size:0.85rem;}
+.stock-input{
+width:80px;padding:0.4rem 0.5rem;border-radius:6px;
+border:1px solid var(--line);background:var(--bg-soft);
+font-size:0.82rem;color:var(--ink);
+}
+.stock-input.low{border-color:var(--danger-light);color:var(--danger-light);font-weight:500;}
+
+.modal-overlay{
+position:fixed;inset:0;z-index:800;
+background:rgba(22,33,26,0.55);backdrop-filter:blur(3px);
+display:flex;align-items:center;justify-content:center;padding:2rem;
+opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto;}
+.modal-box{
+position:relative;background:var(--cream);border-radius:var(--radius-lg);
+padding:2rem 2rem 1.8rem;width:100%;max-width:460px;
+box-shadow:var(--shadow-lg);
+transform:translateY(14px) scale(.98);transition:transform .3s ease;
+max-height:88vh;overflow-y:auto;
+}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+.modal-close{
+position:absolute;top:1rem;right:1rem;width:30px;height:30px;border-radius:50%;
+border:1px solid var(--line);background:transparent;color:var(--ink-soft);
+display:flex;align-items:center;justify-content:center;cursor:pointer;
+transition:background .2s, color .2s;
+}
+.modal-close:hover{background:var(--sage-deep);color:var(--cream);border-color:var(--sage-deep);}
+.modal-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.modal-title{font-family:'Fraunces',serif;font-weight:500;font-size:1.3rem;color:var(--sage-deep);margin-bottom:1.3rem;}
+.form-group{margin-bottom:1rem;}
+.form-label{display:block;font-size:0.76rem;font-weight:500;color:var(--ink-soft);margin-bottom:0.4rem;}
+.form-input, .form-select, .form-textarea{
+width:100%;padding:0.65rem 0.85rem;border-radius:var(--radius-sm);
+border:1px solid var(--line);background:var(--bg-soft);
+font-size:0.85rem;color:var(--ink);outline:none;font-family:inherit;
+transition:border-color .2s, box-shadow .2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus{border-color:var(--sage);box-shadow:var(--focus-ring);}
+.form-textarea{resize:vertical;min-height:76px;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+.modal-submit{width:100%;margin-top:0.5rem;padding:0.8rem;border:none;border-radius:var(--radius-xl);background:var(--sage-deep);color:var(--cream);font-size:0.88rem;font-weight:500;cursor:pointer;transition:background .25s;}
+.modal-submit:hover{background:var(--sage);}
+.search-input{
+width:100%;max-width:320px;
+padding:0.6rem 0.9rem;border-radius:var(--radius-sm);
+border:1px solid var(--line);background:var(--cream);
+font-size:0.85rem;color:var(--ink);outline:none;
+}
+.search-input:focus{border-color:var(--sage);box-shadow:var(--focus-ring);}
+</style>
+</head>
+<body>
+
+<div class="preloader" id="preloader">
+<div class="preloader-mark" id="preloaderMark">Everwell</div>
+</div>
+<script>
+(function(){
+var preloader = document.getElementById('preloader');
+var mark = document.getElementById('preloaderMark');
+var text = mark.textContent;
+mark.innerHTML = text.split('').map(function(ch,i){return '<span style="animation-delay:'+(0.15+i*0.025)+'s">'+(ch===' '?'&nbsp;':ch)+'</span>';}).join('');
+var dismissed = false;
+function dismissPreloader(){
+if(dismissed) return;
+dismissed = true;
+preloader.classList.add('done');
+setTimeout(function(){ preloader.remove(); }, 500);
+}
+setTimeout(dismissPreloader, 800);
+})();
+</script>
+
+<!-- NAV -->
+<nav class="admin-nav">
+<div class="nav-left">
+<span class="nav-mark">Ever<em>well</em></span>
+<span class="nav-brand-sep"></span>
+<span class="nav-label" id="navRoleLabel">Pharmacist</span>
+</div>
+<div class="nav-right">
+<a href="homepage.html" class="nav-home">
+<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+Home
+</a>
+<div class="nav-avatar" id="navAvatar" title="Pharmacist">PH</div>
+<a href="homepage.html" class="nav-logout">Log Out</a>
+</div>
+</nav>
+
+<div class="admin-body">
+
+<aside class="sidebar" id="sidebar-pharmacist">
+<div class="sidebar-section">
+<div class="sidebar-label">Navigation</div>
+<a href="#" class="sidebar-link active">
+<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+Dashboard
+</a>
+<a href="#rx-queue-section" class="sidebar-link">
+<svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg>
+Prescriptions
+<span class="sidebar-badge" id="badgeRxPending">0</span>
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-label">Safety</div>
+<a href="#drug-safety-section" class="sidebar-link">
+<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+Drug Safety Alerts
+<span class="sidebar-badge" id="badgeFlagged" style="background:var(--danger);">0</span>
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-label">Inventory</div>
+<a href="#inventory-section" class="sidebar-link">
+<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+Pharmacy Inventory
+<span class="sidebar-badge" id="badgeLowStock" style="background:var(--gold);">0</span>
+</a>
+<a href="#inventory-section" class="sidebar-link">
+<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+OTC Sales
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-label">Patient Records</div>
+<a href="#med-history-section" class="sidebar-link">
+<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+Medication History
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-label">Services</div>
+<a href="#consultation-log-section" class="sidebar-link">
+<svg viewBox="0 0 24 24"><path d="M9 12h6M12 9v6M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+Consultation Log
+<span class="sidebar-badge" id="badgeConsults">0</span>
+</a>
+</div>
+<div class="sidebar-section">
+<div class="sidebar-label">System</div>
+<a href="#" class="sidebar-link">
+<svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+Settings
+</a>
+</div>
+</aside>
+
+<!-- MAIN CONTENT AREA -->
+<main class="admin-main">
+
+<div class="page-header">
+<h1>Pharmacist Dashboard</h1>
+<p>Prescription validation, drug safety, and inventory management.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+<div class="stat-card">
+<div class="stat-icon">
+<svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg>
+</div>
+<div class="stat-value" id="statRxPending">0</div>
+<div class="stat-label">Prescriptions Pending</div>
+<div class="stat-change down" id="statRxPendingSub">—</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon">
+<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+</div>
+<div class="stat-value" id="statFlagged">0</div>
+<div class="stat-label">Drug Safety Alerts</div>
+<div class="stat-change down">Action required</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon">
+<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+</div>
+<div class="stat-value" id="statLowStock">0</div>
+<div class="stat-label">Low Stock Items</div>
+<div class="stat-change down">Reorder needed</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon">
+<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+</div>
+<div class="stat-value" id="statDispensedToday">0</div>
+<div class="stat-label">Dispensed Today</div>
+<div class="stat-change up">Validated prescriptions, today</div>
+</div>
+</div>
+
+<!-- Drug Safety Alerts -->
+<div class="card" id="drug-safety-section">
+<div class="card-header">
+<h3>Drug Safety Alerts</h3>
+</div>
+<div id="drugAlertsBody"></div>
+</div>
+
+<!-- Low Stock Alert -->
+<div class="alert-strip" id="lowStockStrip" style="display:none;">
+<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+<span id="lowStockText"></span>
+</div>
+
+<!-- Prescription Queue -->
+<div class="card" id="rx-queue-section">
+<div class="card-header">
+<h3>Prescription Queue</h3>
+<div class="filter-bar" id="rxFilterBar">
+<button class="filter-btn active" data-filter="All">All</button>
+<button class="filter-btn" data-filter="Pending">Pending</button>
+<button class="filter-btn" data-filter="Flagged">Flagged</button>
+<button class="filter-btn" data-filter="Completed">Validated</button>
+</div>
+</div>
+<table class="admin-table">
+<thead>
+<tr>
+<th>Patient</th>
+<th>Medication</th>
+<th>Date</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="rxQueueBody"></tbody>
+</table>
+</div>
+
+<!-- Pharmacy Inventory (Prescription & OTC) -->
+<div class="card" id="inventory-section">
+<div class="card-header">
+<h3>Pharmacy Inventory</h3>
+<div style="display:flex; gap:0.6rem; align-items:center;">
+<div class="filter-bar" id="invFilterBar">
+<button class="filter-btn active" data-filter="All">All</button>
+<button class="filter-btn" data-filter="Prescription">Prescription</button>
+<button class="filter-btn" data-filter="OTC">OTC</button>
+<button class="filter-btn" data-filter="Low">Low Stock</button>
+</div>
+<button class="action-btn" onclick="openItemModal()">+ Add Item</button>
+</div>
+</div>
+<table class="admin-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Type</th>
+<th>Stock</th>
+<th>Reorder Level</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="inventoryBody"></tbody>
+</table>
+</div>
+
+<!-- Patient Medication History Lookup -->
+<div class="card" id="med-history-section">
+<div class="card-header">
+<h3>Patient Medication History</h3>
+<input type="text" class="search-input" id="medHistorySearch" placeholder="Search patient by name…">
+</div>
+<table class="admin-table">
+<thead>
+<tr>
+<th>Patient</th>
+<th>Medication</th>
+<th>Date</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="medHistoryBody"></tbody>
+</table>
+</div>
+
+<!-- Pharmacist Consultation Log -->
+<div class="card" id="consultation-log-section">
+<div class="card-header">
+<h3>Consultation Log</h3>
+<button class="action-btn outline" onclick="openConsultLogModal()">+ Log Consultation</button>
+</div>
+<table class="admin-table" id="consultLogTable">
+<thead>
+<tr>
+<th>Patient</th>
+<th>Service</th>
+<th>Date</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody id="consultLogBody"></tbody>
+</table>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+<div class="card-header">
+<h3>Quick Actions</h3>
+</div>
+<div class="quick-actions">
+<button class="quick-btn" onclick="filterInventory('OTC'); document.getElementById('inventory-section').scrollIntoView({behavior:'smooth'})">
+<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+OTC Sale
+</button>
+<button class="quick-btn" onclick="openItemModal()">
+<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+Manage Inventory
+</button>
+<button class="quick-btn" onclick="document.getElementById('medHistorySearch').focus(); document.getElementById('med-history-section').scrollIntoView({behavior:'smooth'})">
+<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+Look Up Medication History
+</button>
+<button class="quick-btn" onclick="filterInventory('Low'); document.getElementById('inventory-section').scrollIntoView({behavior:'smooth'})">
+<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+Low Stock Report
+</button>
+</div>
+</div>
+
+</main>
+</div>
+
+<!-- GENERIC MODAL -->
+<div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+<div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close">
+<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+</button>
+<h3 class="modal-title" id="modalTitle">Title</h3>
+<form id="modalForm"></form>
+</div>
+</div>
+<datalist id="patientList"></datalist>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* SIDEBAR */
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    const targetId = link.getAttribute('href');
+    if (targetId && targetId.length > 1 && targetId.startsWith('#')) {
+      const el = document.querySelector(targetId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+/* TOAST */
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ========================================================
+   EVERWELL SHARED DATA LAYER (same keys across all dashboards)
+   ======================================================== */
+const K = {
+	patients: 'everwell_patients',
+	appointments: 'everwell_appointments',
+	records: 'everwell_medical_records',
+	invoices: 'everwell_invoices',
+	referrals: 'everwell_referrals',
+	activity: 'everwell_admin_activity',
+	settings: 'everwell_clinic_settings',
+	inventory: 'everwell_pharmacy_inventory'
+};
+function lsGet(key, fallback){ try{ const raw = localStorage.getItem(key); return raw!==null ? JSON.parse(raw) : fallback; }catch(e){ return fallback; } }
+function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function escapeHtml(str){ return String(str==null?'':str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function logActivity(text){ const list = lsGet(K.activity, []); list.unshift({text, time:new Date().toISOString()}); lsSet(K.activity, list.slice(0,30)); }
+
+function seedIfEmpty(){
+	if(localStorage.getItem(K.patients) === null){
+		const today = todayStr();
+		lsSet(K.patients, [
+			{id:uid(), name:'Maria Santos', email:'maria.santos@email.com', phone:'0917 123 4567', dob:'1990-04-12', lastVisit:today, allergies:''},
+			{id:uid(), name:'Jose Reyes', email:'jose.reyes@email.com', phone:'0918 234 5678', dob:'1985-11-02', lastVisit:today, allergies:''},
+			{id:uid(), name:'Ana Cruz', email:'ana.cruz@email.com', phone:'0919 345 6789', dob:'1994-06-23', lastVisit:today, allergies:'Sulfa Drugs'},
+			{id:uid(), name:'Pedro Lim', email:'pedro.lim@email.com', phone:'0920 456 7890', dob:'1978-01-15', lastVisit:today, allergies:''},
+			{id:uid(), name:'Lorna Diaz', email:'lorna.diaz@email.com', phone:'0921 567 8901', dob:'1988-09-30', lastVisit:today, allergies:'Penicillin'},
+			{id:uid(), name:'Carlos Tan', email:'carlos.tan@email.com', phone:'0922 678 9012', dob:'1996-03-08', lastVisit:today, allergies:'Latex'},
+			{id:uid(), name:'Ben Torres', email:'ben.torres@email.com', phone:'0923 789 0123', dob:'1982-07-19', lastVisit:today, allergies:''},
+			{id:uid(), name:'Nina Gao', email:'nina.gao@email.com', phone:'0924 890 1234', dob:'1999-12-05', lastVisit:today, allergies:''},
+			{id:uid(), name:'Rosa Vega', email:'rosa.vega@email.com', phone:'0925 901 2345', dob:'1975-02-28', lastVisit:today, allergies:''},
+			{id:uid(), name:'Tomas Yu', email:'tomas.yu@email.com', phone:'0926 012 3456', dob:'1991-10-11', lastVisit:today, allergies:''}
+		]);
+		lsSet(K.appointments, [
+			{id:uid(), patient:'Maria Santos', service:'General Checkup', date:today, time:'09:00', status:'Confirmed', stage:'Checked In', type:'Scheduled'},
+			{id:uid(), patient:'Jose Reyes', service:'Cardiology Consult', date:today, time:'09:45', status:'Confirmed', stage:'In Progress', type:'Scheduled'},
+			{id:uid(), patient:'Ana Cruz', service:'Lab Results Review', date:today, time:'10:30', status:'Pending', stage:'Checked In', type:'Scheduled'},
+			{id:uid(), patient:'Pedro Lim', service:'Pharmacy Pickup', date:today, time:'11:15', status:'Confirmed', stage:'Checked In', type:'Scheduled'},
+			{id:uid(), patient:'Lorna Diaz', service:'OB/GYN Consult', date:today, time:'13:00', status:'Pending', stage:'Triage', type:'Scheduled'},
+			{id:uid(), patient:'Carlos Tan', service:'X-Ray & Imaging', date:today, time:'14:30', status:'Cancelled', stage:'Waiting', type:'Walk-in'},
+			{id:uid(), patient:'Ben Torres', service:'Follow-up', date:today, time:'15:00', status:'Pending', stage:'Waiting', type:'Walk-in'},
+			{id:uid(), patient:'Nina Gao', service:'General Consult', date:today, time:'15:30', status:'Pending', stage:'Waiting', type:'Walk-in'},
+			{id:uid(), patient:'Rosa Vega', service:'Vaccination', date:today, time:'08:45', status:'Confirmed', stage:'Completed', type:'Scheduled'},
+			{id:uid(), patient:'Tomas Yu', service:'Follow-up', date:today, time:'08:30', status:'Confirmed', stage:'Completed', type:'Scheduled'}
+		]);
+		lsSet(K.records, [
+			{id:uid(), patient:'Ana Cruz', note:'Lab results reviewed — cholesterol within normal range.', date:today},
+			{id:uid(), patient:'Maria Santos', note:'Annual physical completed, no concerns noted.', date:today}
+		]);
+		lsSet(K.invoices, [
+			{id:uid(), patient:'Jose Reyes', description:'Cardiology Consult', amount:2500, date:today, status:'Paid'},
+			{id:uid(), patient:'Pedro Lim', description:'Pharmacy Pickup — Losartan 50mg', amount:850, date:today, status:'Paid'},
+			{id:uid(), patient:'Lorna Diaz', description:'OB/GYN Consult', amount:3200, date:today, status:'Unpaid'}
+		]);
+		lsSet(K.referrals, [
+			{id:uid(), patient:'Carlos Tan', type:'Hospital Referral', details:"Referred to partner hospital for advanced imaging.", date:today, status:'Pending'},
+			{id:uid(), patient:'Jose Reyes', type:'Hospital Referral', details:"Referred to partner hospital for a cardiac MRI.", date:today, status:'Completed'},
+			{id:uid(), patient:'Lorna Diaz', type:'Lab Referral', details:"Referred to partner lab for an ultrasound.", date:today, status:'Pending'},
+			{id:uid(), patient:'Ana Cruz', type:'Lab Referral', details:"Referred to partner clinic for dermatology.", date:today, status:'Pending'},
+			{id:uid(), patient:'Lorna Diaz', type:'Pharmacy Referral', details:"Prescribed: Amoxicillin 500mg, twice daily for 7 days.", date:today, status:'Pending'},
+			{id:uid(), patient:'Maria Santos', type:'Pharmacy Referral', details:"Prescribed: Losartan 50mg, once daily.", date:today, status:'Completed'}
+		]);
+		lsSet(K.activity, [
+			{text:'<strong>Maria Santos</strong> checked in for her annual physical.', time:new Date(Date.now()-5*60000).toISOString()},
+			{text:'<strong>Dr. Rivera</strong> uploaded lab results for Ana Cruz.', time:new Date(Date.now()-18*60000).toISOString()},
+			{text:'New prescription dispensed — <strong>Losartan 50mg</strong>.', time:new Date(Date.now()-32*60000).toISOString()},
+			{text:'<strong>Ana Cruz</strong> scheduled a follow-up for next week.', time:new Date(Date.now()-60*60000).toISOString()},
+			{text:'System backup completed successfully.', time:new Date(Date.now()-120*60000).toISOString()}
+		]);
+	}
+	if(localStorage.getItem(K.inventory) === null){
+		lsSet(K.inventory, [
+			{id:uid(), name:'Metformin 500mg', category:'Prescription', stock:12, reorder:30},
+			{id:uid(), name:'Insulin Glargine', category:'Prescription', stock:8, reorder:25},
+			{id:uid(), name:'Salbutamol Inhaler', category:'Prescription', stock:5, reorder:20},
+			{id:uid(), name:'Losartan 50mg', category:'Prescription', stock:84, reorder:30},
+			{id:uid(), name:'Basic Pain Relievers', category:'OTC', stock:210, reorder:50},
+			{id:uid(), name:'Multivitamins & Supplements', category:'OTC', stock:96, reorder:40},
+			{id:uid(), name:'Cough & Cold Syrup', category:'OTC', stock:54, reorder:30},
+			{id:uid(), name:'Allergy Relief Tablets', category:'OTC', stock:140, reorder:40}
+		]);
+	}
+}
+function populatePatientDatalist(){
+	const patients = lsGet(K.patients, []);
+	document.getElementById('patientList').innerHTML = patients.map(p=>`<option value="${escapeHtml(p.name)}">`).join('');
+}
+
+/* ---------------- MODAL ---------------- */
+const modalOverlay = document.getElementById('modalOverlay');
+const modalTitleEl = document.getElementById('modalTitle');
+const modalForm = document.getElementById('modalForm');
+document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', e=>{ if(e.target===modalOverlay) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+function openModal(title, fieldsHtml, onSubmit){
+	modalTitleEl.textContent = title;
+	modalForm.innerHTML = fieldsHtml + '<button type="submit" class="modal-submit">Save</button>';
+	modalForm.onsubmit = function(e){ e.preventDefault(); onSubmit(new FormData(modalForm)); };
+	modalOverlay.classList.add('open');
+	modalOverlay.setAttribute('aria-hidden','false');
+	const firstInput = modalForm.querySelector('input, select, textarea');
+	if(firstInput) setTimeout(()=>firstInput.focus(), 60);
+}
+function closeModal(){
+	modalOverlay.classList.remove('open');
+	modalOverlay.setAttribute('aria-hidden','true');
+}
+
+/* ---------------- DRUG SAFETY ---------------- */
+const ALLERGY_DRUG_CLASSES = {
+	'penicillin': ['penicillin','amoxicillin','ampicillin'],
+	'sulfa drugs': ['sulfa','sulfamethoxazole','bactrim','trimethoprim'],
+	'sulfa': ['sulfa','sulfamethoxazole','bactrim','trimethoprim']
+};
+function isFlagged(referral){
+	const patients = lsGet(K.patients, []);
+	const p = patients.find(x=>x.name===referral.patient);
+	if(!p || !p.allergies) return false;
+	const allergyKey = p.allergies.toLowerCase().trim();
+	const detailsLower = referral.details.toLowerCase();
+	if(allergyKey && detailsLower.includes(allergyKey)) return true;
+	const classList = ALLERGY_DRUG_CLASSES[allergyKey];
+	return classList ? classList.some(drug=>detailsLower.includes(drug)) : false;
+}
+function patientAllergy(name){
+	const p = lsGet(K.patients, []).find(x=>x.name===name);
+	return p ? (p.allergies||'') : '';
+}
+
+/* ---------------- FILTER STATE ---------------- */
+let rxFilter = 'All';
+let invFilter = 'All';
+document.querySelectorAll('#rxFilterBar .filter-btn').forEach(btn=>{
+	btn.addEventListener('click', ()=>{
+		document.querySelectorAll('#rxFilterBar .filter-btn').forEach(b=>b.classList.remove('active'));
+		btn.classList.add('active');
+		rxFilter = btn.dataset.filter;
+		renderRxQueue();
+	});
+});
+document.querySelectorAll('#invFilterBar .filter-btn').forEach(btn=>{
+	btn.addEventListener('click', ()=>{
+		document.querySelectorAll('#invFilterBar .filter-btn').forEach(b=>b.classList.remove('active'));
+		btn.classList.add('active');
+		invFilter = btn.dataset.filter;
+		renderInventory();
+	});
+});
+function filterInventory(f){
+	invFilter = f;
+	document.querySelectorAll('#invFilterBar .filter-btn').forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+	renderInventory();
+}
+let medHistorySearch = '';
+document.getElementById('medHistorySearch').addEventListener('input', e=>{ medHistorySearch = e.target.value; renderMedHistory(); });
+
+/* ---------------- RENDER ---------------- */
+function renderAll(){
+	renderStats();
+	renderDrugAlerts();
+	renderLowStockStrip();
+	renderRxQueue();
+	renderInventory();
+	renderMedHistory();
+	renderConsultLog();
+	updateBadges();
+}
+function rxItems(){ return lsGet(K.referrals, []).filter(r=>r.type==='Pharmacy Referral'); }
+function updateBadges(){
+	const rx = rxItems();
+	const inv = lsGet(K.inventory, []);
+	document.getElementById('badgeRxPending').textContent = rx.filter(r=>r.status==='Pending').length;
+	document.getElementById('badgeFlagged').textContent = rx.filter(r=>r.status==='Pending' && isFlagged(r)).length;
+	document.getElementById('badgeLowStock').textContent = inv.filter(i=>i.stock<=i.reorder).length;
+	document.getElementById('badgeConsults').textContent = lsGet(K.records, []).filter(r=>r.note.startsWith('Pharmacist Consultation:')).length;
+}
+function renderStats(){
+	const today = todayStr();
+	const rx = rxItems();
+	const pending = rx.filter(r=>r.status==='Pending');
+	const flagged = pending.filter(isFlagged);
+	const inv = lsGet(K.inventory, []);
+	document.getElementById('statRxPending').textContent = pending.length;
+	document.getElementById('statRxPendingSub').textContent = `${flagged.length} flagged for review`;
+	document.getElementById('statFlagged').textContent = flagged.length;
+	document.getElementById('statLowStock').textContent = inv.filter(i=>i.stock<=i.reorder).length;
+	document.getElementById('statDispensedToday').textContent = rx.filter(r=>r.status==='Completed' && r.date===today).length;
+}
+function renderDrugAlerts(){
+	const flagged = rxItems().filter(r=>r.status==='Pending' && isFlagged(r));
+	const box = document.getElementById('drugAlertsBody');
+	box.innerHTML = flagged.length ? flagged.map(r=>`
+		<div class="drug-alert">
+			<h5>Allergy Alert — ${escapeHtml(r.patient)}</h5>
+			<p><strong>Patient:</strong> ${escapeHtml(r.patient)} &nbsp;|&nbsp; <strong>Prescribed:</strong> ${escapeHtml(r.details)}<br>
+			Documented allergy: <strong>${escapeHtml(patientAllergy(r.patient))}</strong>. Confirm alternative with prescriber before dispensing.</p>
+		</div>
+	`).join('') : `<div class="empty-state">No active drug safety alerts.</div>`;
+}
+function renderLowStockStrip(){
+	const low = lsGet(K.inventory, []).filter(i=>i.stock<=i.reorder);
+	const strip = document.getElementById('lowStockStrip');
+	if(!low.length){ strip.style.display = 'none'; return; }
+	strip.style.display = 'flex';
+	document.getElementById('lowStockText').innerHTML = '<strong>Low Stock:</strong> ' + low.map(i=>`${escapeHtml(i.name)} (${i.stock} units)`).join(', ');
+}
+function renderRxQueue(){
+	let list = rxItems().slice().sort((a,b)=>b.date.localeCompare(a.date));
+	if(rxFilter==='Pending') list = list.filter(r=>r.status==='Pending' && !isFlagged(r));
+	else if(rxFilter==='Flagged') list = list.filter(r=>r.status==='Pending' && isFlagged(r));
+	else if(rxFilter==='Completed') list = list.filter(r=>r.status==='Completed');
+	const body = document.getElementById('rxQueueBody');
+	body.innerHTML = list.length ? list.map(r=>{
+		const flagged = r.status==='Pending' && isFlagged(r);
+		const statusHtml = r.status==='Completed'
+			? `<span class="status-pill validated">Validated</span>`
+			: flagged
+				? `<span class="status-pill flagged">Flagged</span>`
+				: `<span class="status-pill pending">Pending</span>`;
+		const action = r.status==='Completed'
+			? `<span class="muted-cell" style="color:var(--ink-soft);opacity:0.6;font-size:0.8rem;">Done</span>`
+			: flagged
+				? `<button class="action-btn danger" onclick="reviewFlagged('${r.id}')"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Review</button>`
+				: `<button class="action-btn" onclick="validateRx('${r.id}')"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Validate</button>`;
+		return `
+			<tr>
+				<td>${escapeHtml(r.patient)}</td>
+				<td>${escapeHtml(r.details)}</td>
+				<td>${escapeHtml(r.date)}</td>
+				<td>${statusHtml}</td>
+				<td>${action}</td>
+			</tr>`;
+	}).join('') : `<tr><td colspan="5" class="empty-state">No prescriptions in this view.</td></tr>`;
+}
+function validateRx(id){
+	const list = lsGet(K.referrals, []);
+	const idx = list.findIndex(x=>x.id===id);
+	if(idx<0) return;
+	list[idx].status = 'Completed';
+	lsSet(K.referrals, list);
+	logActivity(`Dispensed to <strong>${escapeHtml(list[idx].patient)}</strong> — ${escapeHtml(list[idx].details)}.`);
+	showToast('Prescription validated','success');
+	renderAll();
+}
+function reviewFlagged(id){
+	const r = lsGet(K.referrals, []).find(x=>x.id===id);
+	if(!r) return;
+	showToast(`Flagged — ${r.patient} has a documented ${patientAllergy(r.patient)} allergy. Contact prescriber.`, 'error');
+}
+
+function renderInventory(){
+	let items = lsGet(K.inventory, []).slice().sort((a,b)=>a.name.localeCompare(b.name));
+	if(invFilter==='Prescription') items = items.filter(i=>i.category==='Prescription');
+	else if(invFilter==='OTC') items = items.filter(i=>i.category==='OTC');
+	else if(invFilter==='Low') items = items.filter(i=>i.stock<=i.reorder);
+	const body = document.getElementById('inventoryBody');
+	body.innerHTML = items.length ? items.map(i=>`
+		<tr>
+			<td>${escapeHtml(i.name)}</td>
+			<td>${escapeHtml(i.category)}</td>
+			<td><input class="stock-input ${i.stock<=i.reorder?'low':''}" type="number" min="0" value="${i.stock}" onchange="updateStock('${i.id}', this.value)"></td>
+			<td>${i.reorder}</td>
+			<td><button class="action-btn" onclick="reorderItem('${i.id}')"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Reorder</button></td>
+		</tr>
+	`).join('') : `<tr><td colspan="5" class="empty-state">No items match this view.</td></tr>`;
+}
+function updateStock(id, value){
+	const list = lsGet(K.inventory, []);
+	const idx = list.findIndex(x=>x.id===id);
+	if(idx<0) return;
+	list[idx].stock = Math.max(0, parseInt(value,10)||0);
+	lsSet(K.inventory, list);
+	renderAll();
+}
+function reorderItem(id){
+	const list = lsGet(K.inventory, []);
+	const idx = list.findIndex(x=>x.id===id);
+	if(idx<0) return;
+	list[idx].stock += 50;
+	lsSet(K.inventory, list);
+	logActivity(`Reorder placed for <strong>${escapeHtml(list[idx].name)}</strong> (+50 units).`);
+	showToast(`Reorder request sent for ${list[idx].name}`,'success');
+	renderAll();
+}
+function openItemModal(){
+	const fields = `
+		<div class="form-group"><label class="form-label">Item Name</label><input class="form-input" name="name" required></div>
+		<div class="form-row-2">
+			<div class="form-group"><label class="form-label">Category</label>
+				<select class="form-select" name="category"><option>Prescription</option><option>OTC</option></select>
+			</div>
+			<div class="form-group"><label class="form-label">Starting Stock</label><input class="form-input" type="number" min="0" name="stock" required></div>
+		</div>
+		<div class="form-group"><label class="form-label">Reorder Level</label><input class="form-input" type="number" min="0" name="reorder" required></div>
+	`;
+	openModal('Add Inventory Item', fields, (fd)=>{
+		const name = (fd.get('name')||'').trim();
+		if(!name) return;
+		const list = lsGet(K.inventory, []);
+		list.push({id:uid(), name, category:fd.get('category'), stock:parseInt(fd.get('stock'),10)||0, reorder:parseInt(fd.get('reorder'),10)||0});
+		lsSet(K.inventory, list);
+		logActivity(`New inventory item added: <strong>${escapeHtml(name)}</strong>.`);
+		closeModal();
+		showToast('Item added','success');
+		renderAll();
+	});
+}
+
+function renderMedHistory(){
+	let list = rxItems().slice().sort((a,b)=>b.date.localeCompare(a.date));
+	const q = medHistorySearch.trim().toLowerCase();
+	if(q) list = list.filter(r=>r.patient.toLowerCase().includes(q));
+	const body = document.getElementById('medHistoryBody');
+	body.innerHTML = list.length ? list.map(r=>`
+		<tr>
+			<td>${escapeHtml(r.patient)}</td>
+			<td>${escapeHtml(r.details)}</td>
+			<td>${escapeHtml(r.date)}</td>
+			<td>${r.status==='Completed' ? '<span class="status-pill completed">Completed</span>' : (isFlagged(r)?'<span class="status-pill flagged">Flagged</span>':'<span class="status-pill pending">Pending</span>')}</td>
+		</tr>
+	`).join('') : `<tr><td colspan="4" class="empty-state">No medication history yet.</td></tr>`;
+}
+
+function renderConsultLog(){
+	const list = lsGet(K.records, []).filter(r=>r.note.startsWith('Pharmacist Consultation:')).sort((a,b)=>b.date.localeCompare(a.date));
+	const body = document.getElementById('consultLogBody');
+	body.innerHTML = list.length ? list.map(r=>`
+		<tr><td>${escapeHtml(r.patient)}</td><td>Pharmacist Consultation</td><td>${escapeHtml(r.date)}</td><td>${escapeHtml(r.note.replace('Pharmacist Consultation: ',''))}</td></tr>
+	`).join('') : `<tr><td colspan="4" class="empty-state">No consultations logged yet.</td></tr>`;
+}
+function openConsultLogModal(){
+	const fields = `
+		<div class="form-group"><label class="form-label">Patient</label><input class="form-input" name="patient" list="patientList" required></div>
+		<div class="form-group"><label class="form-label">Service</label>
+			<select class="form-select" name="service">
+				<option>Pharmacist Medication Consultation</option>
+				<option>Drug Allergy Checking</option>
+				<option>Blood Sugar Testing</option>
+				<option>Patient Medication History Printout</option>
+			</select>
+		</div>
+		<div class="form-group"><label class="form-label">Notes / Result</label><textarea class="form-textarea" name="notes" placeholder="Optional"></textarea></div>
+	`;
+	openModal('Log Consultation', fields, (fd)=>{
+		const patient = (fd.get('patient')||'').trim();
+		if(!patient) return;
+		const service = fd.get('service');
+		const notes = (fd.get('notes')||'').trim();
+		const records = lsGet(K.records, []);
+		records.push({id:uid(), patient, note:`Pharmacist Consultation: ${service}${notes?' — '+notes:''}`, date:todayStr()});
+		lsSet(K.records, records);
+		logActivity(`Pharmacist consultation logged for <strong>${escapeHtml(patient)}</strong> — ${escapeHtml(service)}.`);
+		closeModal();
+		showToast('Consultation logged','success');
+		renderAll();
+	});
+}
+
+/* ---------------- INIT ---------------- */
+seedIfEmpty();
+populatePatientDatalist();
+renderAll();
+</script>
+</body>
+</html>
