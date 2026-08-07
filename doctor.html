@@ -550,11 +550,11 @@ Home
 <aside class="sidebar" id="sidebar-doctor">
 <div class="sidebar-section">
 <div class="sidebar-label">Navigation</div>
-<a href="#" class="sidebar-link active">
+<a href="#dashboard-top" class="sidebar-link active" data-scroll="dashboard-top">
 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
 Dashboard
 </a>
-<a href="#" class="sidebar-link">
+<a href="#patients-section" class="sidebar-link" data-scroll="patients-section">
 <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
 My Patients
 <span class="sidebar-badge" id="badgePatients">0</span>
@@ -562,15 +562,15 @@ My Patients
 </div>
 <div class="sidebar-section">
 <div class="sidebar-label">Clinical</div>
-<a href="#" class="sidebar-link">
+<a href="#recordsCard" class="sidebar-link" data-scroll="recordsCard">
 <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
 Medical Records
 </a>
-<a href="#" class="sidebar-link">
+<a href="#" class="sidebar-link" id="navConsultWorkspace">
 <svg viewBox="0 0 24 24"><path d="M9 12h6M12 9v6M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
 Consultation Workspace
 </a>
-<a href="#" class="sidebar-link">
+<a href="#referrals-section" class="sidebar-link" data-scroll="referrals-section">
 <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg>
 Prescriptions
 <span class="sidebar-badge" id="badgeRx">0</span>
@@ -578,7 +578,7 @@ Prescriptions
 </div>
 <div class="sidebar-section">
 <div class="sidebar-label">Referrals</div>
-<a href="#" class="sidebar-link">
+<a href="#referrals-section" class="sidebar-link" data-scroll="referrals-section">
 <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
 My Referrals
 <span class="sidebar-badge" id="badgeReferrals">0</span>
@@ -586,7 +586,7 @@ My Referrals
 </div>
 <div class="sidebar-section">
 <div class="sidebar-label">System</div>
-<a href="#" class="sidebar-link">
+<a href="#" class="sidebar-link" id="navSettings">
 <svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
 Settings
 </a>
@@ -596,7 +596,7 @@ Settings
 <!-- MAIN CONTENT AREA -->
 <main class="admin-main">
 
-<div class="page-header">
+<div class="page-header" id="dashboard-top">
 <h1>Doctor Dashboard</h1>
 <p>Clinical work queue — Dr. Rivera. Today's patients and consultation workspace.</p>
 </div>
@@ -638,7 +638,7 @@ Settings
 </div>
 
 <!-- My Patients Table -->
-<div class="card">
+<div class="card" id="patients-section">
 <div class="card-header">
 <h3>My Patients Today</h3>
 <div class="filter-bar" id="docFilterBar">
@@ -665,7 +665,7 @@ Settings
 <!-- Content Grid -->
 <div class="content-grid">
 <!-- Pending Referrals -->
-<div class="card">
+<div class="card" id="referrals-section">
 <div class="card-header">
 <h3>Pending Referrals</h3>
 <button class="action-btn outline" onclick="openReferralModal()">+ New</button>
@@ -750,12 +750,26 @@ My Patient List
 
 <script>
 /* SIDEBAR */
-document.querySelectorAll('.sidebar-link').forEach(link => {
+document.querySelectorAll('.sidebar-link[data-scroll]').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
     link.classList.add('active');
+    const el = document.getElementById(link.dataset.scroll);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+});
+document.getElementById('navConsultWorkspace').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  openConsultModal();
+});
+document.getElementById('navSettings').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  showToast('Settings — coming soon', 'success');
 });
 
 /* TOAST */
