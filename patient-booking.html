@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everwell Medical Clinic — Book Appointment</title>
+<meta name="description" content="Book your medical consultations, pharmacy services, and lab diagnostics at Everwell Medical Clinic.">
+<meta name="theme-color" content="#16211A">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#F1F3EC;--bg-soft:#E7ECE1;--cream:#FAF8F3;--ink:#1E2A22;--ink-soft:#4A554C;
+  --sage:#4F6B57;--sage-light:#8AA491;--sage-deep:#16211A;--clay:#DCCAB3;--gold:#B99B67;
+  --line:rgba(30,42,34,0.12);--radius-sm:8px;--radius-md:18px;--radius-lg:22px;--radius-xl:100px;
+  --shadow-sm:0 2px 8px rgba(22,33,26,0.06);--shadow-md:0 8px 24px rgba(22,33,26,0.1);
+  --focus-ring:0 0 0 3px rgba(79,107,87,0.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;font-weight:400;
+  min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;cursor:default;
+}
+a{color:inherit;text-decoration:none;}
+
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.2rem 4vw;
+  background:rgba(250,248,243,0.92);
+  backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 var(--line);
+}
+.nav-mark{
+  font-family:'Fraunces',serif;font-size:1.5rem;font-weight:500;
+  letter-spacing:-0.015em;display:inline-flex;align-items:baseline;color:var(--ink);
+}
+.nav-mark em{font-style:italic;font-weight:400;color:var(--sage);}
+.nav-back{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.88rem;font-weight:500;color:var(--ink-soft);
+  transition:color .3s, gap .3s;
+}
+.nav-back:hover{color:var(--sage-deep);gap:0.7rem;}
+.nav-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s;}
+.nav-back:hover svg{transform:translateX(-3px);}
+
+.booking-layout{
+  flex:1;padding:2rem 4vw 3rem;max-width:960px;width:100%;margin:0 auto;
+}
+.booking-header{
+  margin-bottom:1.8rem;
+  opacity:0;transform:translateY(18px);
+  animation:fadeUp .7s cubic-bezier(.16,1,.3,1) forwards;animation-delay:.15s;
+}
+.booking-header h1{
+  font-family:'Fraunces',serif;font-weight:400;font-size:1.8rem;
+  letter-spacing:-0.01em;color:var(--sage-deep);
+}
+.booking-header p{font-size:0.88rem;color:var(--ink-soft);margin-top:0.3rem;}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+.steps{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:2.2rem;
+  opacity:0;transform:translateY(18px);
+  animation:fadeUp .7s cubic-bezier(.16,1,.3,1) forwards;animation-delay:.25s;
+  flex-wrap:wrap;
+}
+.step{
+  display:flex;align-items:center;gap:0.5rem;
+  font-size:0.8rem;font-weight:500;color:var(--ink-soft);
+}
+.step.active{color:var(--sage-deep);font-weight:600;}
+.step.done{color:var(--sage);}
+.step-num{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:600;
+  background:var(--bg-soft);color:var(--ink-soft);
+  transition:all .3s ease;
+}
+.step.active .step-num{background:var(--sage);color:var(--cream);}
+.step.done .step-num{background:var(--sage-deep);color:var(--cream);}
+.step-line{width:28px;height:1px;background:var(--line);margin:0 0.4rem;}
+.step-line.done{background:var(--sage);}
+
+.booking-panel{display:none;}
+.booking-panel.active{display:block;}
+
+.cat-tabs{
+  display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:0.5rem;margin-bottom:1.5rem;
+  border-bottom:1px solid var(--line);
+}
+.cat-tab{
+  padding:0.55rem 1.1rem;border-radius:var(--radius-xl);
+  font-size:0.82rem;font-weight:500;color:var(--ink-soft);
+  background:var(--cream);border:1px solid var(--line);
+  cursor:pointer;white-space:nowrap;transition:all .2s ease;
+}
+.cat-tab.active{background:var(--sage-deep);color:var(--cream);border-color:var(--sage-deep);}
+
+.subcat-title{
+  font-family:'Fraunces',serif;font-size:1.1rem;font-weight:400;color:var(--sage-deep);
+  margin:1.5rem 0 0.8rem;display:flex;align-items:center;gap:0.5rem;
+}
+.subcat-title::after{content:'';flex:1;height:1px;background:var(--line);margin-left:0.5rem;}
+
+.service-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:0.9rem;
+  margin-bottom:1.5rem;
+}
+.service-card{
+  padding:1.1rem 1.2rem;border-radius:var(--radius-md);
+  background:var(--cream);border:2px solid var(--line);
+  cursor:pointer;transition:all .25s ease;position:relative;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.service-card:hover{border-color:var(--sage-light);transform:translateY(-2px);box-shadow:var(--shadow-sm);}
+.service-card.selected{border-color:var(--sage);background:rgba(79,107,87,0.04);}
+.service-card.selected::after{
+  content:'';position:absolute;top:0.8rem;right:0.8rem;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--sage);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FAF8F3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-size:14px;background-position:center;background-repeat:no-repeat;
+}
+.service-name{font-weight:600;font-size:0.92rem;color:var(--ink);margin-bottom:0.2rem;padding-right:1.5rem;}
+.service-desc{font-size:0.78rem;color:var(--ink-soft);line-height:1.4;margin-bottom:0.8rem;}
+.service-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:0.6rem;border-top:1px solid var(--line);
+  font-size:0.75rem;font-weight:600;color:var(--sage);
+}
+
+.doctor-list{display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.5rem;}
+.doctor-card{
+  display:flex;align-items:center;gap:1rem;
+  padding:1.1rem 1.2rem;border-radius:var(--radius-md);
+  background:var(--cream);border:2px solid var(--line);
+  cursor:pointer;transition:all .25s ease;position:relative;
+}
+.doctor-card:hover{border-color:var(--sage-light);transform:translateY(-1px);}
+.doctor-card.selected{border-color:var(--sage);background:rgba(79,107,87,0.04);}
+.doctor-card.selected::after{
+  content:'';position:absolute;top:1rem;right:1rem;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--sage);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FAF8F3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-size:14px;background-position:center;background-repeat:no-repeat;
+}
+.doctor-avatar{
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:1rem;font-weight:500;
+  color:var(--cream);flex-shrink:0;
+}
+.doctor-avatar.sage{background:var(--sage);}
+.doctor-avatar.clay{background:#A08C6A;}
+.doctor-avatar.gold{background:var(--gold);}
+.doctor-avatar.ink{background:var(--ink-soft);}
+.doctor-info{flex:1;}
+.doctor-name{font-weight:600;font-size:0.95rem;color:var(--ink);}
+.doctor-spec{font-size:0.8rem;color:var(--ink-soft);margin-top:0.1rem;}
+.doctor-avail{font-size:0.75rem;color:var(--sage);font-weight:500;margin-top:0.2rem;}
+
+.calendar-wrap{
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius-md);
+  padding:1.4rem;margin-bottom:1.5rem;
+}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.cal-header h3{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:400;color:var(--sage-deep);}
+.cal-nav{display:flex;gap:0.4rem;}
+.cal-nav button{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--line);
+  cursor:pointer;color:var(--ink-soft);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s ease;
+}
+.cal-nav button:hover{background:var(--bg-soft);color:var(--sage);}
+.cal-nav svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-label{text-align:center;font-size:0.7rem;font-weight:600;color:var(--ink-soft);padding:0.4rem 0;text-transform:uppercase;letter-spacing:0.04em;}
+.cal-day{text-align:center;padding:0.6rem 0;font-size:0.85rem;border-radius:8px;cursor:pointer;color:var(--ink);transition:all .2s ease;}
+.cal-day:hover{background:var(--bg-soft);}
+.cal-day.selected{background:var(--sage);color:var(--cream);font-weight:600;}
+.cal-day.today{border:1px solid var(--sage-light);}
+.cal-day.disabled{color:rgba(30,42,34,0.2);pointer-events:none;}
+.cal-day.empty{pointer-events:none;}
+
+.time-section{margin-bottom:1.5rem;}
+.time-section h3{font-family:'Fraunces',serif;font-size:1rem;font-weight:400;color:var(--sage-deep);margin-bottom:0.8rem;}
+.time-period{margin-bottom:1rem;}
+.time-period-label{font-size:0.78rem;font-weight:600;color:var(--ink-soft);margin-bottom:0.5rem;}
+.time-slots{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.time-slot{
+  padding:0.55rem 1rem;border-radius:var(--radius-sm);
+  background:var(--cream);border:1.5px solid var(--line);
+  font-size:0.82rem;font-weight:500;color:var(--ink-soft);
+  cursor:pointer;transition:all .25s ease;
+}
+.time-slot:hover{border-color:var(--sage-light);color:var(--sage);}
+.time-slot.selected{background:var(--sage);border-color:var(--sage);color:var(--cream);}
+
+.notes-area{
+  width:100%;min-height:90px;padding:0.9rem 1rem;
+  font-family:'Instrument Sans',sans-serif;font-size:0.88rem;
+  color:var(--ink);background:var(--cream);
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  resize:vertical;outline:none;
+  transition:border-color .3s, box-shadow .3s;
+}
+.notes-area:focus{border-color:var(--sage);box-shadow:var(--focus-ring);}
+
+.booking-summary{
+  background:var(--cream);border:1px solid var(--line);border-radius:var(--radius-md);
+  padding:1.5rem;margin-bottom:1.5rem;
+}
+.summary-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:400;color:var(--sage-deep);margin-bottom:1rem;}
+.summary-row{display:flex;align-items:flex-start;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
+.summary-row:last-child{border-bottom:none;}
+.summary-label{font-size:0.8rem;color:var(--ink-soft);width:130px;flex-shrink:0;}
+.summary-value{font-size:0.88rem;font-weight:600;color:var(--ink);}
+
+/* PAYMENT METHODS */
+.payment-methods{display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.5rem;}
+.pay-card{
+  display:flex;align-items:center;gap:1rem;
+  padding:1.1rem 1.2rem;border-radius:var(--radius-md);
+  background:var(--cream);border:2px solid var(--line);
+  cursor:pointer;transition:all .25s ease;position:relative;
+}
+.pay-card:hover{border-color:var(--sage-light);transform:translateY(-1px);}
+.pay-card.selected{border-color:var(--sage);background:rgba(79,107,87,0.04);}
+.pay-card.selected::after{
+  content:'';position:absolute;top:1rem;right:1rem;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--sage);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FAF8F3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-size:14px;background-position:center;background-repeat:no-repeat;
+}
+.pay-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;flex-shrink:0;
+}
+.pay-icon.cash{background:rgba(220,202,179,0.4);color:#7C623C;}
+.pay-icon.gcash{background:rgba(0,149,246,0.1);color:#0095F6;}
+.pay-icon.maya{background:rgba(0,191,165,0.1);color:#00BFA5;}
+.pay-icon.card{background:rgba(79,107,87,0.12);color:var(--sage);}
+.pay-icon.bank{background:rgba(185,155,103,0.15);color:var(--gold);}
+.pay-details{flex:1;}
+.pay-name{font-weight:600;font-size:0.92rem;color:var(--ink);}
+.pay-desc{font-size:0.78rem;color:var(--ink-soft);margin-top:0.1rem;}
+
+/* RECEIPT OVERLAY */
+.receipt-overlay{
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(22,33,26,0.6);backdrop-filter:blur(6px);
+  z-index:300;align-items:center;justify-content:center;
+}
+.receipt-overlay.show{display:flex;}
+.receipt-card{
+  background:var(--cream);border-radius:var(--radius-lg);
+  width:90%;max-width:440px;padding:2rem 1.8rem;
+  box-shadow:var(--shadow-lg);
+  opacity:0;transform:scale(0.9);
+  transition:all .4s cubic-bezier(.16,1,.3,1);
+}
+.receipt-overlay.show .receipt-card{opacity:1;transform:scale(1);}
+
+.receipt-success{text-align:center;margin-bottom:1.5rem;}
+.receipt-success-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--sage);color:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1rem;
+}
+.receipt-success-icon svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:2.5;}
+.receipt-success h2{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:400;color:var(--sage-deep);}
+.receipt-success p{font-size:0.85rem;color:var(--ink-soft);margin-top:0.3rem;}
+
+.receipt-box{
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:1.2rem;margin-bottom:1.5rem;
+}
+.receipt-row{display:flex;justify-content:space-between;padding:0.45rem 0;font-size:0.82rem;}
+.receipt-row .r-label{color:var(--ink-soft);}
+.receipt-row .r-value{font-weight:500;color:var(--ink);text-align:right;}
+.receipt-divider{border-top:1px dashed var(--line);margin:0.5rem 0;}
+.receipt-total{display:flex;justify-content:space-between;padding:0.6rem 0;font-size:1rem;font-weight:600;color:var(--sage-deep);}
+
+.receipt-notification{
+  text-align:center;margin-bottom:1rem;
+}
+.receipt-notification span{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  background:rgba(79,107,87,0.1);padding:0.5rem 1rem;border-radius:100px;
+  font-size:0.8rem;color:var(--sage);font-weight:500;
+}
+
+.receipt-btn{
+  width:100%;padding:0.9rem;border-radius:var(--radius-xl);
+  background:var(--sage-deep);color:var(--cream);
+  font-family:'Instrument Sans',sans-serif;font-size:0.9rem;font-weight:500;
+  border:none;cursor:pointer;transition:all .3s ease;
+  display:flex;align-items:center;justify-content:center;gap:0.5rem;
+}
+.receipt-btn:hover{background:var(--sage);}
+
+.btn-row{display:flex;gap:0.8rem;margin-top:1.5rem;}
+.btn{
+  flex:1;padding:0.85rem 1.5rem;
+  font-family:'Instrument Sans',sans-serif;font-size:0.88rem;font-weight:500;
+  border-radius:var(--radius-xl);cursor:pointer;
+  transition:all .3s ease;border:none;
+  display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;
+}
+.btn-primary{background:var(--sage-deep);color:var(--cream);}
+.btn-primary:hover:not(:disabled){background:var(--sage);box-shadow:var(--shadow-sm);}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-secondary{background:var(--cream);color:var(--ink-soft);border:1px solid var(--line);}
+.btn-secondary:hover{background:var(--bg-soft);color:var(--sage);}
+
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+  display:flex;align-items:center;gap:0.6rem;
+  background:var(--sage-deep);color:var(--cream);
+  padding:0.9rem 1.6rem;border-radius:var(--radius-xl);
+  font-size:0.85rem;font-weight:500;box-shadow:var(--shadow-md);
+  opacity:0;pointer-events:none;
+  transition:transform 0.45s cubic-bezier(.34,1.56,.64,1), opacity 0.4s ease;
+  z-index:200;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+
+@media(max-width:600px){
+  .booking-layout{padding:1.5rem 3vw 3rem;}
+  .service-grid{grid-template-columns:1fr;}
+  .cal-grid{gap:2px;}
+  .step-line{width:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="patient-dashboard.html" class="nav-back">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5m0 0l6-6m-6 6l6 6"/></svg>
+    Back to Dashboard
+  </a>
+  <a href="patient-dashboard.html" class="nav-mark">Ever<em>well</em></a>
+</nav>
+
+<main class="booking-layout">
+  <div class="booking-header">
+    <h1>Book an Appointment</h1>
+    <p>Select your service, practitioner, schedule, and payment — complete your transaction in minutes.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step active" data-step="1"><span class="step-num">1</span> Service</div>
+    <div class="step-line"></div>
+    <div class="step" data-step="2"><span class="step-num">2</span> Practitioner</div>
+    <div class="step-line"></div>
+    <div class="step" data-step="3"><span class="step-num">3</span> Schedule</div>
+    <div class="step-line"></div>
+    <div class="step" data-step="4"><span class="step-num">4</span> Payment</div>
+    <div class="step-line"></div>
+    <div class="step" data-step="5"><span class="step-num">5</span> Receipt</div>
+  </div>
+
+  <!-- STEP 1: SERVICE -->
+  <div class="booking-panel active" id="step1">
+    <div class="cat-tabs">
+      <button class="cat-tab active" onclick="filterCategory('all', this)">All Services</button>
+      <button class="cat-tab" onclick="filterCategory('cat1', this)">General Medical</button>
+      <button class="cat-tab" onclick="filterCategory('cat2', this)">Pharmacy</button>
+      <button class="cat-tab" onclick="filterCategory('cat3', this)">Diagnostics</button>
+    </div>
+    <div id="servicesContainer"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="nextFromStep1" disabled>
+        Continue to Practitioner
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: PRACTITIONER -->
+  <div class="booking-panel" id="step2">
+    <h3 style="font-family:'Fraunces',serif;font-weight:400;font-size:1.15rem;color:var(--sage-deep);margin-bottom:1rem;">Choose Your Healthcare Provider</h3>
+    <div class="doctor-list">
+      <div class="doctor-card" data-doctor="santos">
+        <div class="doctor-avatar sage">MS</div>
+        <div class="doctor-info">
+          <div class="doctor-name">Dr. Maria Santos</div>
+          <div class="doctor-spec">General Medical & Pediatric Specialist</div>
+          <div class="doctor-avail">Available Mon–Fri • 8:00 AM - 4:00 PM</div>
+        </div>
+      </div>
+      <div class="doctor-card" data-doctor="cruz">
+        <div class="doctor-avatar gold">LC</div>
+        <div class="doctor-info">
+          <div class="doctor-name">Dr. Lisa Cruz</div>
+          <div class="doctor-spec">Cardiologist & Internal Medicine</div>
+          <div class="doctor-avail">Available Mon, Wed, Fri • 9:00 AM - 3:00 PM</div>
+        </div>
+      </div>
+      <div class="doctor-card" data-doctor="tan">
+        <div class="doctor-avatar ink">AT</div>
+        <div class="doctor-info">
+          <div class="doctor-name">Dr. Angelo Tan</div>
+          <div class="doctor-spec">Dermatology & Skin Outpatient</div>
+          <div class="doctor-avail">Available Tue, Thu, Sat • 10:00 AM - 5:00 PM</div>
+        </div>
+      </div>
+      <div class="doctor-card" data-doctor="delacruz">
+        <div class="doctor-avatar clay">AD</div>
+        <div class="doctor-info">
+          <div class="doctor-name">Dr. Abigail Dela Cruz</div>
+          <div class="doctor-spec">OB/GYN & General Surgery Outpatient</div>
+          <div class="doctor-avail">Available Mon–Sat • 8:30 AM - 2:00 PM</div>
+        </div>
+      </div>
+      <div class="doctor-card" data-doctor="pharmacy">
+        <div class="doctor-avatar sage">EP</div>
+        <div class="doctor-info">
+          <div class="doctor-name">Everwell Pharmacist & Lab Team</div>
+          <div class="doctor-spec">Pharmacy CPOE & LIS Diagnostic Technicians</div>
+          <div class="doctor-avail">Available Daily • 7:00 AM - 6:00 PM</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+      <button class="btn btn-primary" id="nextFromStep2" disabled>
+        Continue to Schedule
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: SCHEDULE -->
+  <div class="booking-panel" id="step3">
+    <div class="calendar-wrap">
+      <div class="cal-header">
+        <h3 id="calMonth">July 2026</h3>
+        <div class="cal-nav">
+          <button id="calPrev"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button id="calNext"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="time-section">
+      <h3>Select Available Time Slot</h3>
+      <div class="time-period">
+        <div class="time-period-label">Morning Slots</div>
+        <div class="time-slots" id="morningSlots"></div>
+      </div>
+      <div class="time-period">
+        <div class="time-period-label">Afternoon Slots</div>
+        <div class="time-slots" id="afternoonSlots"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="display:block;font-size:0.78rem;font-weight:600;text-transform:uppercase;color:var(--ink-soft);margin-bottom:0.5rem;">Additional Clinical Notes (Optional)</label>
+      <textarea class="notes-area" id="notesInput" placeholder="Briefly describe your symptoms, current medications, or specific requests..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+      <button class="btn btn-primary" id="nextFromStep3" disabled>
+        Continue to Payment
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 4: PAYMENT -->
+  <div class="booking-panel" id="step4">
+    <h3 style="font-family:'Fraunces',serif;font-weight:400;font-size:1.15rem;color:var(--sage-deep);margin-bottom:0.5rem;">Appointment Summary</h3>
+    <div class="booking-summary">
+      <div class="summary-title">Everwell Appointment Summary</div>
+      <div class="summary-row"><span class="summary-label">Service</span><span class="summary-value" id="sumService">—</span></div>
+      <div class="summary-row"><span class="summary-label">Category</span><span class="summary-value" id="sumCategory">—</span></div>
+      <div class="summary-row"><span class="summary-label">Practitioner</span><span class="summary-value" id="sumDoctor">—</span></div>
+      <div class="summary-row"><span class="summary-label">Date</span><span class="summary-value" id="sumDate">—</span></div>
+      <div class="summary-row"><span class="summary-label">Time</span><span class="summary-value" id="sumTime">—</span></div>
+      <div class="summary-row"><span class="summary-label">Duration</span><span class="summary-value" id="sumDuration">—</span></div>
+      <div class="summary-row"><span class="summary-label">Service Fee</span><span class="summary-value" id="sumFee" style="color:var(--sage-deep);font-size:1rem;">—</span></div>
+    </div>
+
+    <h3 style="font-family:'Fraunces',serif;font-weight:400;font-size:1.15rem;color:var(--sage-deep);margin:1.5rem 0 1rem;">Select Payment Method</h3>
+    <div class="payment-methods">
+      <div class="pay-card" data-pay="cash">
+        <div class="pay-icon cash">💵</div>
+        <div class="pay-details">
+          <div class="pay-name">Cash Payment</div>
+          <div class="pay-desc">Pay in cash at the clinic counter on your appointment day</div>
+        </div>
+      </div>
+      <div class="pay-card" data-pay="gcash">
+        <div class="pay-icon gcash">📱</div>
+        <div class="pay-details">
+          <div class="pay-name">GCash</div>
+          <div class="pay-desc">Pay via GCash mobile wallet — instant confirmation</div>
+        </div>
+      </div>
+      <div class="pay-card" data-pay="maya">
+        <div class="pay-icon maya">💳</div>
+        <div class="pay-details">
+          <div class="pay-name">Maya (PayMaya)</div>
+          <div class="pay-desc">Pay via Maya digital wallet or linked card</div>
+        </div>
+      </div>
+      <div class="pay-card" data-pay="card">
+        <div class="pay-icon card">💳</div>
+        <div class="pay-details">
+          <div class="pay-name">Credit / Debit Card</div>
+          <div class="pay-desc">Visa, Mastercard, JCB accepted — secure processing</div>
+        </div>
+      </div>
+      <div class="pay-card" data-pay="bank">
+        <div class="pay-icon bank">🏦</div>
+        <div class="pay-details">
+          <div class="pay-name">Bank Transfer (InstaPay / PESONet)</div>
+          <div class="pay-desc">Direct bank transfer — verification within 24 hours</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(3)">Back</button>
+      <button class="btn btn-primary" id="nextFromStep4" disabled>
+        Complete Transaction
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M20 6L9 17l-5-5" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- RECEIPT OVERLAY -->
+<div class="receipt-overlay" id="receiptOverlay">
+  <div class="receipt-card">
+    <div class="receipt-success">
+      <div class="receipt-success-icon">
+        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2>Transaction Complete!</h2>
+      <p>Your appointment has been successfully booked and confirmed.</p>
+    </div>
+    <div class="receipt-box" id="receiptBox"></div>
+    <div class="receipt-notification">
+      <span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Dashboard updated with your new appointment!
+      </span>
+    </div>
+    <button class="receipt-btn" id="receiptDoneBtn">
+      Back to Patient Dashboard
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* PROPOSAL DATASET */
+const proposalServices = [
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Basic Checkups',id:'s1_1',name:'Adult Consultation',desc:'Comprehensive routine medical assessment and physical checkup.',duration:'30 min',fee:'₱500'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Basic Checkups',id:'s1_2',name:'Pediatric (Child) Consultation',desc:'Specialized health, growth, and wellness check for infants and children.',duration:'30 min',fee:'₱600'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Basic Checkups',id:'s1_3',name:'Routine Blood Pressure Check',desc:'Vitals tracking, hypertension monitoring, and nurse counseling.',duration:'15 min',fee:'₱150'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Basic Checkups',id:'s1_4',name:'Medical Certificate Issuance',desc:'Clinical evaluation and official health clearance document.',duration:'20 min',fee:'₱300'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Basic Checkups',id:'s1_5',name:'Pre-Employment Checkup',desc:'Physical examination required for workplace onboarding.',duration:'40 min',fee:'₱850'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Specialty Outpatient Consultations',id:'s2_1',name:'Cardiology (Heart) Consultation',desc:'Cardiovascular screening, heart rate, and history review.',duration:'45 min',fee:'₱1,500'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Specialty Outpatient Consultations',id:'s2_2',name:'Dermatology (Skin) Consultation',desc:'Skin, hair, and nail evaluation with treatment plan.',duration:'30 min',fee:'₱1,200'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Specialty Outpatient Consultations',id:'s2_3',name:"OB/GYN (Women's Health) Consultation",desc:'Reproductive health, wellness, and maternity outpatient care.',duration:'45 min',fee:'₱1,300'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Specialty Outpatient Consultations',id:'s2_4',name:'Orthopedic (Bone/Joint) Consultation',desc:'Bone, joint, and musculoskeletal evaluation.',duration:'40 min',fee:'₱1,400'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Minor Clinic Procedures',id:'s3_1',name:'Basic Wound Cleaning & Bandaging',desc:'Antiseptic wound care, dressing, and bandaging.',duration:'25 min',fee:'₱350'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Minor Clinic Procedures',id:'s3_2',name:'Nebulizer Treatment for Asthma',desc:'Inhalation treatment session for acute respiratory relief.',duration:'30 min',fee:'₱400'},
+  {catId:'cat1',categoryName:'General Medical & Consultations',subCat:'Minor Clinic Procedures',id:'s3_3',name:'Ear Cleaning / Flushing',desc:'Professional cerumen removal and ear canal cleaning.',duration:'25 min',fee:'₱500'},
+  {catId:'cat2',categoryName:'Pharmacy & Medication Management',subCat:'Pharmacy Services',id:'p1_1',name:'Pharmacist Medication Consultation',desc:'Detailed counseling on dosage, side effects, and timing.',duration:'20 min',fee:'₱250'},
+  {catId:'cat2',categoryName:'Pharmacy & Medication Management',subCat:'Pharmacy Services',id:'p1_2',name:'Drug Allergy Checking & CPOE Review',desc:'Safety check against your electronic medical record history.',duration:'15 min',fee:'₱200'},
+  {catId:'cat2',categoryName:'Pharmacy & Medication Management',subCat:'Pharmacy Services',id:'p1_3',name:'Blood Sugar Testing (Point of Care)',desc:'Instant glucometer test with immediate results.',duration:'10 min',fee:'₱180'},
+  {catId:'cat3',categoryName:'Diagnostics & Hospital Referrals',subCat:'Basic Laboratory Tests',id:'d1_1',name:'Complete Blood Count (CBC)',desc:'Comprehensive automated blood cell count.',duration:'15 min',fee:'₱350'},
+  {catId:'cat3',categoryName:'Diagnostics & Hospital Referrals',subCat:'Basic Laboratory Tests',id:'d1_2',name:'Fasting Blood Sugar (FBS) Test',desc:'Lab blood draw after overnight fasting.',duration:'15 min',fee:'₱250'},
+  {catId:'cat3',categoryName:'Diagnostics & Hospital Referrals',subCat:'Basic Laboratory Tests',id:'d1_3',name:'Routine Urinalysis',desc:'Standard urine diagnostic panel.',duration:'15 min',fee:'₱200'},
+  {catId:'cat3',categoryName:'Diagnostics & Hospital Referrals',subCat:'Imaging Diagnostics',id:'d2_1',name:'Routine Chest X-Ray',desc:'Single-view digital chest X-ray radiograph.',duration:'20 min',fee:'₱550'},
+  {catId:'cat3',categoryName:'Diagnostics & Hospital Referrals',subCat:'Imaging Diagnostics',id:'d2_2',name:'Standard ECG (Heart Monitor)',desc:'12-lead electrocardiogram recording.',duration:'20 min',fee:'₱600'},
+  {catId:'cat3',categoryName:'Diagnostics & Hospital Referrals',subCat:'External Hospital Referrals',id:'d3_1',name:'General Hospital Admitting Referral',desc:'Electronic compilation of vitals & SOAP notes sent to partner hospital.',duration:'15 min',fee:'₱400'}
+];
+
+const state = {
+  selectedService: null, selectedDoctor: null,
+  selectedDate: null, selectedTime: null,
+  notes: '', paymentMethod: null
+};
+
+// RENDER SERVICES
+function renderServices(filter = 'all') {
+  const container = document.getElementById('servicesContainer');
+  container.innerHTML = '';
+  const filtered = filter === 'all' ? proposalServices : proposalServices.filter(s => s.catId === filter);
+  const subCats = {};
+  filtered.forEach(s => { if (!subCats[s.subCat]) subCats[s.subCat] = []; subCats[s.subCat].push(s); });
+  for (const [subTitle, items] of Object.entries(subCats)) {
+    const titleEl = document.createElement('div');
+    titleEl.className = 'subcat-title'; titleEl.textContent = subTitle;
+    container.appendChild(titleEl);
+    const grid = document.createElement('div');
+    grid.className = 'service-grid';
+    items.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'service-card' + (state.selectedService && state.selectedService.id === s.id ? ' selected' : '');
+      card.innerHTML = '<div><div class="service-name">' + s.name + '</div><div class="service-desc">' + s.desc + '</div></div><div class="service-meta"><span>' + s.duration + '</span><span>' + s.fee + '</span></div>';
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.selectedService = s;
+        document.getElementById('nextFromStep1').disabled = false;
+      });
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  }
+}
+
+function filterCategory(catId, btn) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderServices(catId);
+}
+
+// STEP TRANSITIONS
+function goToStep(n) {
+  document.querySelectorAll('.booking-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  document.querySelectorAll('.step').forEach(s => {
+    const step = parseInt(s.dataset.step);
+    s.classList.remove('active', 'done');
+    if (step < n) s.classList.add('done');
+    if (step === n) s.classList.add('active');
+  });
+  document.querySelectorAll('.step-line').forEach((l, i) => { l.classList.toggle('done', i < n - 1); });
+  if (n === 3) renderCalendar();
+  if (n === 4) populateSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('nextFromStep1').addEventListener('click', () => goToStep(2));
+
+document.querySelectorAll('.doctor-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.doctor-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    const name = card.querySelector('.doctor-name').textContent;
+    const spec = card.querySelector('.doctor-spec').textContent;
+    state.selectedDoctor = name + ' — ' + spec;
+    document.getElementById('nextFromStep2').disabled = false;
+  });
+});
+document.getElementById('nextFromStep2').addEventListener('click', () => goToStep(3));
+
+// CALENDAR
+let calMonth = 6, calYear = 2026;
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    const lbl = document.createElement('div');
+    lbl.className = 'cal-day-label'; lbl.textContent = d; grid.appendChild(lbl);
+  });
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  for (let i = 0; i < firstDay; i++) { const e = document.createElement('div'); e.className = 'cal-day empty'; grid.appendChild(e); }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'cal-day'; dayEl.textContent = d;
+    if (state.selectedDate && state.selectedDate.getDate() === d && state.selectedDate.getMonth() === calMonth && state.selectedDate.getFullYear() === calYear) dayEl.classList.add('selected');
+    dayEl.addEventListener('click', () => {
+      document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('selected'));
+      dayEl.classList.add('selected');
+      state.selectedDate = new Date(calYear, calMonth, d);
+      renderTimeSlots();
+      checkStep3Ready();
+    });
+    grid.appendChild(dayEl);
+  }
+  document.getElementById('calMonth').textContent = monthNames[calMonth] + ' ' + calYear;
+}
+document.getElementById('calPrev').addEventListener('click', () => { calMonth--; renderCalendar(); });
+document.getElementById('calNext').addEventListener('click', () => { calMonth++; renderCalendar(); });
+
+const morningTimes = ['8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM'];
+const afternoonTimes = ['1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM'];
+
+function renderTimeSlots() {
+  const mC = document.getElementById('morningSlots'); const aC = document.getElementById('afternoonSlots');
+  mC.innerHTML = ''; aC.innerHTML = '';
+  morningTimes.forEach(t => { const b = document.createElement('button'); b.className = 'time-slot' + (state.selectedTime === t ? ' selected' : ''); b.textContent = t; b.addEventListener('click', () => selectTime(t, b)); mC.appendChild(b); });
+  afternoonTimes.forEach(t => { const b = document.createElement('button'); b.className = 'time-slot' + (state.selectedTime === t ? ' selected' : ''); b.textContent = t; b.addEventListener('click', () => selectTime(t, b)); aC.appendChild(b); });
+}
+function selectTime(t, btn) { document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected')); btn.classList.add('selected'); state.selectedTime = t; checkStep3Ready(); }
+function checkStep3Ready() { document.getElementById('nextFromStep3').disabled = !(state.selectedDate && state.selectedTime); }
+
+document.getElementById('nextFromStep3').addEventListener('click', () => {
+  state.notes = document.getElementById('notesInput').value;
+  goToStep(4);
+});
+
+// STEP 4 SUMMARY
+function populateSummary() {
+  const s = state.selectedService;
+  document.getElementById('sumCategory').textContent = s ? s.categoryName : '—';
+  document.getElementById('sumService').textContent = s ? s.name : '—';
+  document.getElementById('sumDoctor').textContent = state.selectedDoctor || '—';
+  document.getElementById('sumDate').textContent = state.selectedDate ? state.selectedDate.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' }) : '—';
+  document.getElementById('sumTime').textContent = state.selectedTime || '—';
+  document.getElementById('sumDuration').textContent = s ? s.duration : '—';
+  document.getElementById('sumFee').textContent = s ? s.fee : '—';
+}
+
+// PAYMENT SELECTION
+document.querySelectorAll('.pay-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.paymentMethod = card.dataset.pay;
+    document.getElementById('nextFromStep4').disabled = false;
+  });
+});
+
+// PROCESS TRANSACTION
+document.getElementById('nextFromStep4').addEventListener('click', () => {
+  const s = state.selectedService;
+  const dateStr = state.selectedDate ? state.selectedDate.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }) : 'July 30, 2026';
+  const txnId = 'EW-' + Date.now().toString().slice(-8);
+  const payNames = { cash:'Cash Payment', gcash:'GCash', maya:'Maya (PayMaya)', card:'Credit / Debit Card', bank:'Bank Transfer (InstaPay)' };
+  const payIcons = { cash:'💵', gcash:'📱', maya:'💳', card:'💳', bank:'🏦' };
+
+  // Build receipt
+  document.getElementById('receiptBox').innerHTML =
+    '<div class="receipt-row"><span class="r-label">Receipt No.</span><span class="r-value">' + txnId + '</span></div>' +
+    '<div class="receipt-divider"></div>' +
+    '<div class="receipt-row"><span class="r-label">Service</span><span class="r-value">' + (s ? s.name : '—') + '</span></div>' +
+    '<div class="receipt-row"><span class="r-label">Category</span><span class="r-value">' + (s ? s.categoryName : '—') + '</span></div>' +
+    '<div class="receipt-row"><span class="r-label">Practitioner</span><span class="r-value">' + (state.selectedDoctor || '—') + '</span></div>' +
+    '<div class="receipt-row"><span class="r-label">Date & Time</span><span class="r-value">' + dateStr + ' at ' + (state.selectedTime || '—') + '</span></div>' +
+    '<div class="receipt-row"><span class="r-label">Duration</span><span class="r-value">' + (s ? s.duration : '—') + '</span></div>' +
+    '<div class="receipt-row"><span class="r-label">Payment</span><span class="r-value">' + (payIcons[state.paymentMethod] || '') + ' ' + (payNames[state.paymentMethod] || '—') + '</span></div>' +
+    (state.notes ? '<div class="receipt-row"><span class="r-label">Notes</span><span class="r-value">' + state.notes.substring(0,60) + (state.notes.length > 60 ? '...' : '') + '</span></div>' : '') +
+    '<div class="receipt-divider"></div>' +
+    '<div class="receipt-total"><span>Total Paid</span><span>' + (s ? s.fee : '₱0') + '</span></div>';
+
+  // Save to localStorage for dashboard
+  const existing = JSON.parse(localStorage.getItem('everwell_appointments') || '[]');
+  const newAppt = {
+    id: txnId,
+    category: s.categoryName,
+    service: s.name,
+    doctor: state.selectedDoctor,
+    date: dateStr,
+    time: state.selectedTime,
+    status: 'Confirmed',
+    fee: s.fee,
+    paymentMethod: payNames[state.paymentMethod],
+    paymentIcon: payIcons[state.paymentMethod],
+    txnId: txnId,
+    bookedAt: new Date().toISOString()
+  };
+  existing.unshift(newAppt);
+  localStorage.setItem('everwell_appointments', JSON.stringify(existing));
+
+  // Show receipt overlay
+  document.getElementById('receiptOverlay').classList.add('show');
+  showToast('Transaction complete! Receipt generated.');
+});
+
+document.getElementById('receiptDoneBtn').addEventListener('click', () => {
+  document.getElementById('receiptOverlay').classList.remove('show');
+  showToast('Redirecting to your dashboard...');
+  setTimeout(() => { window.location.href = 'patient-dashboard.html'; }, 1200);
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => { renderServices(); renderTimeSlots(); });
+</script>
+</body>
+</html>
