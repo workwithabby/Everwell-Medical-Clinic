@@ -50,6 +50,14 @@ font-weight:400;
 min-height:100vh;
 }
 a{color:inherit;text-decoration:none;}
+:focus-visible{outline:2px solid var(--sage);outline-offset:2px;}
+.skip-link{
+position:fixed;top:-100px;left:1rem;z-index:999;
+background:var(--sage-deep);color:var(--cream);
+padding:0.7rem 1.2rem;border-radius:var(--radius-sm);
+font-size:0.85rem;transition:top .2s ease;
+}
+.skip-link:focus{top:0.8rem;}
 
 /* NAV */
 .admin-nav{
@@ -59,6 +67,15 @@ display:flex;align-items:center;justify-content:space-between;
 padding:1.2rem 4vw;
 }
 .nav-left{display:flex;align-items:center;gap:2rem;}
+.nav-menu-btn{
+display:none;align-items:center;justify-content:center;
+width:36px;height:36px;border-radius:8px;
+background:transparent;border:1px solid rgba(250,248,243,0.2);
+color:var(--cream);cursor:pointer;
+transition:background .25s;
+}
+.nav-menu-btn:hover{background:rgba(250,248,243,0.08);}
+.nav-menu-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
 .nav-mark{
 font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;
 letter-spacing:-0.015em;color:var(--cream);
@@ -67,12 +84,6 @@ letter-spacing:-0.015em;color:var(--cream);
 .nav-brand-sep{width:1px;height:20px;background:rgba(250,248,243,0.2);}
 .nav-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:500;}
 .nav-right{display:flex;align-items:center;gap:1.2rem;}
-.nav-home{
-font-size:0.82rem;color:rgba(250,248,243,0.7);
-transition:color .3s;
-}
-.nav-home:hover{color:var(--cream);}
-.nav-home svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 .nav-avatar{
 width:32px;height:32px;border-radius:50%;
 background:var(--sage);color:var(--cream);
@@ -273,9 +284,23 @@ z-index:200;white-space:nowrap;
 .content-grid{grid-template-columns:1fr;}
 }
 @media(max-width:760px){
-.sidebar{display:none;}
+.sidebar{
+transform:translateX(-100%);
+transition:transform var(--transition-med);
+box-shadow:var(--shadow-lg);
+}
+.sidebar.open{transform:translateX(0);}
+.sidebar-scrim{
+position:fixed;inset:60px 0 0 0;z-index:49;
+background:rgba(22,33,26,0.4);
+opacity:0;pointer-events:none;transition:opacity var(--transition-med);
+}
+.sidebar-scrim.open{opacity:1;pointer-events:auto;}
+.nav-menu-btn{display:inline-flex;}
 .admin-main{margin-left:0;padding:1.4rem 1.2rem;}
 .stats-row{grid-template-columns:1fr 1fr;}
+.sidebar-link{padding:0.8rem 1.2rem;}
+.icon-btn{padding:0.55rem;}
 }
 
 /* ===== SPLASH / PRELOADER ===== */
@@ -301,6 +326,8 @@ to{opacity:1;transform:translateY(0);}
 .preloader.done{transform:translateY(-100%);}
 @media (prefers-reduced-motion: reduce){
 .preloader-mark span{animation-duration:.01ms !important;}
+*{transition-duration:.01ms !important;animation-duration:.01ms !important;}
+html{scroll-behavior:auto;}
 }
 
 /* ===== SECTIONS ===== */
@@ -429,6 +456,8 @@ transition:border-color .2s, box-shadow .2s;
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <div class="preloader" id="preloader">
 <div class="preloader-mark" id="preloaderMark">Everwell</div>
 </div>
@@ -452,23 +481,23 @@ setTimeout(dismissPreloader, 800);
 <!-- NAV -->
 <nav class="admin-nav">
 <div class="nav-left">
+<button type="button" class="nav-menu-btn" id="navMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
 <span class="nav-mark">Ever<em>well</em></span>
 <span class="nav-brand-sep"></span>
 <span class="nav-label">Admin</span>
 </div>
 <div class="nav-right">
-<a href="homepage.html" class="nav-home">
-<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
-Home
-</a>
 <div class="nav-avatar" id="navAvatar" title="Admin">A</div>
 <a href="homepage.html" class="nav-logout">Log Out</a>
 </div>
 </nav>
 
 <div class="admin-body">
+<div class="sidebar-scrim" id="sidebarScrim"></div>
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar" role="navigation" aria-label="Admin sections">
 <div class="sidebar-section">
 <div class="sidebar-label">Overview</div>
 <a href="#" class="sidebar-link active" data-section="dashboard">
@@ -515,7 +544,7 @@ Settings
 </aside>
 
 <!-- MAIN -->
-<main class="admin-main">
+<main class="admin-main" id="main-content" tabindex="-1">
 
 <!-- ===================== DASHBOARD ===================== -->
 <section class="section active" id="section-dashboard">
@@ -563,7 +592,7 @@ Settings
 <div class="card">
 <div class="card-header">
 <h3>Today's Appointments</h3>
-<a href="#" class="card-action" onclick="event.preventDefault(); switchSection('appointments');">View All →</a>
+<a href="#" class="card-action" onclick="event.preventDefault(); goToSection('appointments');">View All →</a>
 </div>
 <table class="admin-table">
 <thead>
@@ -590,7 +619,7 @@ Settings
 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg>
 New Appointment
 </button>
-<button class="quick-btn" onclick="switchSection('patients'); setTimeout(()=>document.getElementById('patientSearch').focus(),80);">
+<button class="quick-btn" onclick="goToSection('patients'); setTimeout(()=>document.getElementById('patientSearch').focus(),80);">
 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
 Find Patient
 </button>
@@ -954,14 +983,23 @@ function showToast(msg, type='success'){
 /* ========================================================
    SIDEBAR / SECTION SWITCHING
    ======================================================== */
+const VALID_SECTIONS = ['dashboard','patients','appointments','records','billing','pharmacy','reports','settings'];
 document.querySelectorAll('.sidebar-link[data-section]').forEach(link=>{
 	link.addEventListener('click', e=>{
 		e.preventDefault();
-		switchSection(link.dataset.section);
+		goToSection(link.dataset.section);
 	});
 });
+function goToSection(section){
+	if(location.hash.slice(1) === section){ switchSection(section); return; }
+	location.hash = section;
+}
 function switchSection(section){
-	document.querySelectorAll('.sidebar-link[data-section]').forEach(l=> l.classList.toggle('active', l.dataset.section===section));
+	document.querySelectorAll('.sidebar-link[data-section]').forEach(l=>{
+		const isActive = l.dataset.section === section;
+		l.classList.toggle('active', isActive);
+		if(isActive) l.setAttribute('aria-current','page'); else l.removeAttribute('aria-current');
+	});
 	document.querySelectorAll('.section').forEach(s=> s.classList.toggle('active', s.id === 'section-'+section));
 	if(section==='dashboard') renderDashboard();
 	else if(section==='patients') renderPatients(document.getElementById('patientSearch').value);
@@ -971,7 +1009,36 @@ function switchSection(section){
 	else if(section==='pharmacy') renderPharmacy(document.getElementById('referralSearch').value);
 	else if(section==='reports') renderReports();
 	else if(section==='settings') loadSettingsForm();
+	document.getElementById('main-content').focus({preventScroll:true});
+	closeMobileSidebar();
 }
+function sectionFromHash(){
+	const s = location.hash.replace('#','');
+	return VALID_SECTIONS.includes(s) ? s : 'dashboard';
+}
+window.addEventListener('hashchange', ()=> switchSection(sectionFromHash()));
+
+/* ========================================================
+   MOBILE SIDEBAR DRAWER
+   ======================================================== */
+const sidebarEl = document.getElementById('sidebar');
+const sidebarScrim = document.getElementById('sidebarScrim');
+const navMenuBtn = document.getElementById('navMenuBtn');
+function openMobileSidebar(){
+	sidebarEl.classList.add('open');
+	sidebarScrim.classList.add('open');
+	navMenuBtn.setAttribute('aria-expanded','true');
+}
+function closeMobileSidebar(){
+	sidebarEl.classList.remove('open');
+	sidebarScrim.classList.remove('open');
+	navMenuBtn.setAttribute('aria-expanded','false');
+}
+navMenuBtn.addEventListener('click', ()=>{
+	sidebarEl.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
+});
+sidebarScrim.addEventListener('click', closeMobileSidebar);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMobileSidebar(); });
 function updateBadges(){
 	const patients = lsGet(K.patients, []);
 	const appts = lsGet(K.appointments, []);
@@ -1502,7 +1569,7 @@ document.getElementById('settingsForm').addEventListener('submit', e=>{
 seedIfEmpty();
 populatePatientDatalist();
 applySettingsToChrome(lsGet(K.settings, defaultSettings()));
-renderDashboard();
+switchSection(sectionFromHash());
 </script>
 </body>
 </html>

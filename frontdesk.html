@@ -58,6 +58,15 @@ padding:1.2rem 4vw;
 height:60px;
 }
 .nav-left{display:flex;align-items:center;gap:2rem;}
+.nav-menu-btn{
+display:none;align-items:center;justify-content:center;
+width:36px;height:36px;border-radius:8px;
+background:transparent;border:1px solid rgba(250,248,243,0.2);
+color:var(--cream);cursor:pointer;
+transition:background .25s;
+}
+.nav-menu-btn:hover{background:rgba(250,248,243,0.08);}
+.nav-menu-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
 .nav-mark{
 font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;
 letter-spacing:-0.015em;color:var(--cream);
@@ -66,12 +75,6 @@ letter-spacing:-0.015em;color:var(--cream);
 .nav-brand-sep{width:1px;height:20px;background:rgba(250,248,243,0.2);}
 .nav-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:500;}
 .nav-right{display:flex;align-items:center;gap:1.2rem;}
-.nav-home{
-font-size:0.82rem;color:rgba(250,248,243,0.7);
-transition:color .3s;
-}
-.nav-home:hover{color:var(--cream);}
-.nav-home svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 .nav-avatar{
 width:32px;height:32px;border-radius:50%;
 background:var(--sage);color:var(--cream);
@@ -136,9 +139,9 @@ margin-left:240px;flex:1;
 padding:2rem 2.4rem;
 }
 
-/* DASHBOARD PANELS */
-.dashboard-panel{display:none;}
-.dashboard-panel.active{display:block;}
+/* SECTIONS (one page at a time) */
+.section{display:none;}
+.section.active{display:block;}
 
 /* PAGE HEADER */
 .page-header{margin-bottom:2rem;}
@@ -379,6 +382,7 @@ transition:background .3s, color .3s;
 }
 .filter-btn.active{background:var(--sage-deep);color:var(--cream);border-color:var(--sage-deep);}
 .filter-btn:hover{border-color:var(--sage);}
+.card-header .filter-bar{margin-bottom:0;}
 
 /* DRUG ALERT */
 .drug-alert{
@@ -405,10 +409,23 @@ border-radius:var(--radius-sm);margin-bottom:0.8rem;
 .queue-board{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:760px){
-.sidebar{display:none;}
+.sidebar{
+transform:translateX(-100%);
+transition:transform var(--transition-med);
+box-shadow:var(--shadow-lg);
+}
+.sidebar.open{transform:translateX(0);}
+.sidebar-scrim{
+position:fixed;inset:60px 0 0 0;z-index:49;
+background:rgba(22,33,26,0.4);
+opacity:0;pointer-events:none;transition:opacity var(--transition-med);
+}
+.sidebar-scrim.open{opacity:1;pointer-events:auto;}
+.nav-menu-btn{display:inline-flex;}
 .admin-main{margin-left:0;padding:1.4rem 1.2rem;}
 .stats-row{grid-template-columns:1fr 1fr;}
 .queue-board{grid-template-columns:1fr;}
+.sidebar-link{padding:0.8rem 1.2rem;}
 }
 
 /* ===== SPLASH / PRELOADER ===== */
@@ -495,6 +512,14 @@ transition:border-color .2s, box-shadow .2s;
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
 .modal-submit{width:100%;margin-top:0.5rem;padding:0.8rem;border:none;border-radius:var(--radius-xl);background:var(--sage-deep);color:var(--cream);font-size:0.88rem;font-weight:500;cursor:pointer;transition:background .25s;}
 .modal-submit:hover{background:var(--sage);}
+.search-input{
+width:100%;max-width:260px;
+padding:0.6rem 0.9rem;border-radius:var(--radius-sm);
+border:1px solid var(--line);background:var(--cream);
+font-size:0.85rem;color:var(--ink);outline:none;
+}
+.search-input:focus{border-color:var(--sage);box-shadow:var(--focus-ring);}
+.settings-form{max-width:520px;}
 </style>
 </head>
 <body>
@@ -522,35 +547,35 @@ setTimeout(dismissPreloader, 800);
 <!-- NAV -->
 <nav class="admin-nav">
 <div class="nav-left">
+<button type="button" class="nav-menu-btn" id="navMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar-frontdesk">
+<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
 <span class="nav-mark">Ever<em>well</em></span>
 <span class="nav-brand-sep"></span>
 <span class="nav-label" id="navRoleLabel">Front Desk</span>
 </div>
 <div class="nav-right">
-<a href="homepage.html" class="nav-home">
-<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
-Home
-</a>
 <div class="nav-avatar" id="navAvatar" title="Front Desk">FD</div>
 <a href="homepage.html" class="nav-logout">Log Out</a>
 </div>
 </nav>
 
 <div class="admin-body">
+<div class="sidebar-scrim" id="sidebarScrim"></div>
 
-<aside class="sidebar" id="sidebar-frontdesk">
+<aside class="sidebar" id="sidebar-frontdesk" role="navigation" aria-label="Front desk sections">
 <div class="sidebar-section">
 <div class="sidebar-label">Navigation</div>
-<a href="#dashboard-top" class="sidebar-link active" data-scroll="dashboard-top">
+<a href="#" class="sidebar-link active" data-section="dashboard">
 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
 Dashboard
 </a>
-<a href="#queue-section" class="sidebar-link" data-scroll="queue-section">
+<a href="#" class="sidebar-link" data-section="patients">
 <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
 Patients
 <span class="sidebar-badge" id="badgePatients">0</span>
 </a>
-<a href="#appointments-section" class="sidebar-link" data-scroll="appointments-section">
+<a href="#" class="sidebar-link" data-section="appointments">
 <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
 Appointments
 <span class="sidebar-badge" id="badgeAppts">0</span>
@@ -558,19 +583,19 @@ Appointments
 </div>
 <div class="sidebar-section">
 <div class="sidebar-label">Logistics</div>
-<a href="#referrals-section" class="sidebar-link" data-scroll="referrals-section">
+<a href="#" class="sidebar-link" data-section="referrals">
 <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
 Referrals
 <span class="sidebar-badge" id="badgeReferrals">0</span>
 </a>
-<a href="#" class="sidebar-link" id="navPatientSearch">
+<a href="#" class="sidebar-link" data-section="appointments" id="navPatientSearch">
 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
 Patient Search
 </a>
 </div>
 <div class="sidebar-section">
 <div class="sidebar-label">System</div>
-<a href="#" class="sidebar-link" id="navSettings">
+<a href="#" class="sidebar-link" data-section="settings">
 <svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
 Settings
 </a>
@@ -578,17 +603,13 @@ Settings
 </aside>
 
 <!-- MAIN CONTENT AREA -->
-<main class="admin-main">
+<main class="admin-main" id="main-content" tabindex="-1">
 
-<div class="page-header" id="dashboard-top">
+<!-- ===================== DASHBOARD ===================== -->
+<section class="section active" id="section-dashboard">
+<div class="page-header">
 <h1>Front Desk Dashboard</h1>
 <p>Today's appointments, patient check-in, and queue management.</p>
-</div>
-
-<!-- Search Bar -->
-<div class="search-bar">
-<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-<input type="text" id="fdSearch" placeholder="Search today's appointments by patient or service...">
 </div>
 
 <!-- Stats -->
@@ -628,16 +649,57 @@ Settings
 </div>
 
 <!-- Queue Status Board -->
-<div class="card" id="queue-section">
+<div class="card">
 <div class="card-header">
 <h3>Queue / Status Board</h3>
-<button type="button" class="card-action" style="background:none;border:none;cursor:pointer;" onclick="renderAll()">Refresh →</button>
+<button type="button" class="card-action" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:0.35rem;" onclick="renderAll()">
+<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0020.49 15"/></svg>
+Refresh
+</button>
 </div>
 <div class="queue-board" id="queueBoard"></div>
 </div>
+</section>
 
-<!-- Appointments Table -->
-<div class="card" id="appointments-section">
+<!-- ===================== PATIENTS ===================== -->
+<section class="section" id="section-patients">
+<div class="page-header">
+<h1>Patients</h1>
+<p>Registered patients and their records on file.</p>
+</div>
+<div class="card">
+<div class="card-header">
+<h3>Patients</h3>
+<div style="display:flex; align-items:center; gap:0.6rem;">
+<input type="text" class="search-input" id="fdPatientSearch" placeholder="Search patients…">
+<button class="action-btn" onclick="openPatientModal()">
+<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add Patient
+</button>
+</div>
+</div>
+<table class="admin-table">
+<thead>
+<tr><th>Name</th><th>Email</th><th>Phone</th><th>Allergies</th><th></th></tr>
+</thead>
+<tbody id="fdPatientsBody"></tbody>
+</table>
+</div>
+</section>
+
+<!-- ===================== APPOINTMENTS ===================== -->
+<section class="section" id="section-appointments">
+<div class="page-header">
+<h1>Today's Appointments</h1>
+<p>Search, filter, and manage check-ins for today's schedule.</p>
+</div>
+
+<!-- Search Bar -->
+<div class="search-bar">
+<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+<input type="text" id="fdSearch" placeholder="Search today's appointments by patient or service...">
+</div>
+
+<div class="card">
 <div class="card-header">
 <h3>Today's Appointments</h3>
 <div style="display:flex; align-items:center; gap:0.6rem;">
@@ -666,9 +728,15 @@ Settings
 <tbody id="fdAppointmentsBody"></tbody>
 </table>
 </div>
+</section>
 
-<!-- Referrals -->
-<div class="card" id="referrals-section">
+<!-- ===================== REFERRALS ===================== -->
+<section class="section" id="section-referrals">
+<div class="page-header">
+<h1>Referral Logistics</h1>
+<p>Pharmacy, lab, and hospital referrals for patients.</p>
+</div>
+<div class="card">
 <div class="card-header">
 <h3>Referral Logistics</h3>
 <button class="action-btn" onclick="openReferralModal()">
@@ -689,6 +757,27 @@ Settings
 <tbody id="fdReferralsBody"></tbody>
 </table>
 </div>
+</section>
+
+<!-- ===================== SETTINGS ===================== -->
+<section class="section" id="section-settings">
+<div class="page-header">
+<h1>Settings</h1>
+<p>Your front desk profile preferences.</p>
+</div>
+<div class="card settings-form">
+<div class="card-header">
+<h3>Settings</h3>
+</div>
+<form id="settingsForm">
+<div class="form-group">
+<label class="form-label">Your Display Name</label>
+<input class="form-input" id="settingDisplayName" name="displayName" placeholder="e.g. Front Desk Staff">
+</div>
+<button type="submit" class="modal-submit" style="width:auto;padding:0.75rem 1.6rem;">Save Settings</button>
+</form>
+</div>
+</section>
 
 <!-- GENERIC MODAL -->
 <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
@@ -709,29 +798,57 @@ Settings
 <div class="toast" id="toast"></div>
 
 <script>
-/* SIDEBAR (anchor-scroll) */
-document.querySelectorAll('.sidebar-link[data-scroll]').forEach(link => {
+/* SIDEBAR — each link shows its own page/section; Patient Search jumps to
+   Appointments and focuses the search box */
+const VALID_SECTIONS = ['dashboard','patients','appointments','referrals','settings'];
+document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
-    const el = document.getElementById(link.dataset.scroll);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    goToSection(link.dataset.section);
+    if (link.id === 'navPatientSearch') {
+      setTimeout(() => document.getElementById('fdSearch').focus(), 350);
+    }
   });
 });
-document.getElementById('navPatientSearch').addEventListener('click', (e) => {
-  e.preventDefault();
-  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-  e.currentTarget.classList.add('active');
-  document.getElementById('fdSearch').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(() => document.getElementById('fdSearch').focus(), 300);
+function goToSection(section){
+  if(location.hash.slice(1) === section){ switchSection(section); return; }
+  location.hash = section;
+}
+function switchSection(section){
+  document.querySelectorAll('.sidebar-link[data-section]').forEach(l=>{
+    const isActive = l.dataset.section === section;
+    l.classList.toggle('active', isActive);
+    if(isActive) l.setAttribute('aria-current','page'); else l.removeAttribute('aria-current');
+  });
+  document.querySelectorAll('.section').forEach(s=> s.classList.toggle('active', s.id === 'section-'+section));
+  document.getElementById('main-content').focus({preventScroll:true});
+  closeMobileSidebar();
+}
+function sectionFromHash(){
+  const s = location.hash.replace('#','');
+  return VALID_SECTIONS.includes(s) ? s : 'dashboard';
+}
+window.addEventListener('hashchange', ()=> switchSection(sectionFromHash()));
+
+/* MOBILE SIDEBAR DRAWER */
+const sidebarEl = document.getElementById('sidebar-frontdesk');
+const sidebarScrim = document.getElementById('sidebarScrim');
+const navMenuBtn = document.getElementById('navMenuBtn');
+function openMobileSidebar(){
+  sidebarEl.classList.add('open');
+  sidebarScrim.classList.add('open');
+  navMenuBtn.setAttribute('aria-expanded','true');
+}
+function closeMobileSidebar(){
+  sidebarEl.classList.remove('open');
+  sidebarScrim.classList.remove('open');
+  navMenuBtn.setAttribute('aria-expanded','false');
+}
+navMenuBtn.addEventListener('click', ()=>{
+  sidebarEl.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
 });
-document.getElementById('navSettings').addEventListener('click', (e) => {
-  e.preventDefault();
-  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-  e.currentTarget.classList.add('active');
-  showToast('Settings — coming soon', 'success');
-});
+sidebarScrim.addEventListener('click', closeMobileSidebar);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMobileSidebar(); });
 
 /* TOAST */
 function showToast(msg, type = 'success') {
@@ -851,7 +968,9 @@ function stagePillClass(stage){
 /* ---------------- FILTER STATE ---------------- */
 let currentFilter = 'All';
 let currentSearch = '';
+let patientSearch = '';
 document.getElementById('fdSearch').addEventListener('input', e=>{ currentSearch = e.target.value; renderAppointments(); });
+document.getElementById('fdPatientSearch').addEventListener('input', e=>{ patientSearch = e.target.value; renderPatients(); });
 document.querySelectorAll('#fdFilterBar .filter-btn').forEach(btn=>{
 	btn.addEventListener('click', ()=>{
 		document.querySelectorAll('#fdFilterBar .filter-btn').forEach(b=>b.classList.remove('active'));
@@ -865,9 +984,55 @@ document.querySelectorAll('#fdFilterBar .filter-btn').forEach(btn=>{
 function renderAll(){
 	renderStats();
 	renderQueueBoard();
+	renderPatients();
 	renderAppointments();
 	renderReferrals();
 	updateBadges();
+}
+function renderPatients(){
+	const patients = lsGet(K.patients, []).slice().sort((a,b)=>a.name.localeCompare(b.name));
+	const q = patientSearch.trim().toLowerCase();
+	const filtered = q ? patients.filter(p=>p.name.toLowerCase().includes(q) || (p.email||'').toLowerCase().includes(q)) : patients;
+	const body = document.getElementById('fdPatientsBody');
+	body.innerHTML = filtered.length ? filtered.map(p=>`
+		<tr>
+			<td>${escapeHtml(p.name)}</td>
+			<td>${escapeHtml(p.email||'—')}</td>
+			<td>${escapeHtml(p.phone||'—')}</td>
+			<td>${p.allergies ? `<span style="color:var(--danger);font-weight:600;">${escapeHtml(p.allergies)}</span>` : 'None'}</td>
+			<td><button class="action-btn outline" onclick="openPatientModal('${p.id}')">Edit</button></td>
+		</tr>
+	`).join('') : `<tr><td colspan="5" class="empty-state">No patients found.</td></tr>`;
+}
+function openPatientModal(id){
+	const patients = lsGet(K.patients, []);
+	const p = id ? patients.find(x=>x.id===id) : null;
+	const fields = `
+		<div class="form-group"><label class="form-label">Full Name</label><input class="form-input" name="name" required value="${p?escapeHtml(p.name):''}"></div>
+		<div class="form-row-2">
+			<div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" name="email" value="${p?escapeHtml(p.email||''):''}"></div>
+			<div class="form-group"><label class="form-label">Phone</label><input class="form-input" name="phone" value="${p?escapeHtml(p.phone||''):''}"></div>
+		</div>
+		<div class="form-group"><label class="form-label">Allergies</label><input class="form-input" name="allergies" placeholder="e.g. Penicillin — leave blank if none" value="${p?escapeHtml(p.allergies||''):''}"></div>
+	`;
+	openModal(p?'Edit Patient':'Add Patient', fields, (fd)=>{
+		const name = (fd.get('name')||'').trim();
+		if(!name) return;
+		const list = lsGet(K.patients, []);
+		if(p){
+			const idx = list.findIndex(x=>x.id===p.id);
+			list[idx] = {...list[idx], name, email:(fd.get('email')||'').trim(), phone:(fd.get('phone')||'').trim(), allergies:(fd.get('allergies')||'').trim()};
+			logActivity(`<strong>${escapeHtml(name)}</strong>'s patient record was updated.`);
+		}else{
+			list.push({id:uid(), name, email:(fd.get('email')||'').trim(), phone:(fd.get('phone')||'').trim(), dob:'', lastVisit:todayStr(), allergies:(fd.get('allergies')||'').trim()});
+			logActivity(`New patient <strong>${escapeHtml(name)}</strong> registered.`);
+		}
+		lsSet(K.patients, list);
+		closeModal();
+		showToast(p?'Patient updated':'Patient registered','success');
+		populatePatientDatalist();
+		renderAll();
+	});
 }
 function updateBadges(){
 	const patients = lsGet(K.patients, []);
@@ -1047,10 +1212,26 @@ function openReferralModal(id){
 	});
 }
 
+/* ---------------- SETTINGS ---------------- */
+const PROFILE_KEY = 'everwell_profile_frontdesk';
+function loadSettingsForm(){
+	const s = lsGet(PROFILE_KEY, {displayName:'Front Desk Staff'});
+	document.getElementById('settingDisplayName').value = s.displayName;
+}
+document.getElementById('settingsForm').addEventListener('submit', e=>{
+	e.preventDefault();
+	const displayName = document.getElementById('settingDisplayName').value.trim() || 'Front Desk Staff';
+	lsSet(PROFILE_KEY, {displayName});
+	document.getElementById('navAvatar').textContent = displayName.trim().charAt(0).toUpperCase() + (displayName.trim().split(' ')[1]?displayName.trim().split(' ')[1].charAt(0).toUpperCase():'');
+	showToast('Settings saved','success');
+});
+
 /* ---------------- INIT ---------------- */
 seedIfEmpty();
 populatePatientDatalist();
+loadSettingsForm();
 renderAll();
+switchSection(sectionFromHash());
 </script>
 </body>
 </html>

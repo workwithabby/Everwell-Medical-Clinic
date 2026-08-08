@@ -66,12 +66,6 @@ letter-spacing:-0.015em;color:var(--cream);
 .nav-brand-sep{width:1px;height:20px;background:rgba(250,248,243,0.2);}
 .nav-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(250,248,243,0.55);font-weight:500;}
 .nav-right{display:flex;align-items:center;gap:1.2rem;}
-.nav-home{
-font-size:0.82rem;color:rgba(250,248,243,0.7);
-transition:color .3s;
-}
-.nav-home:hover{color:var(--cream);}
-.nav-home svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 .nav-avatar{
 width:32px;height:32px;border-radius:50%;
 background:var(--sage);color:var(--cream);
@@ -84,6 +78,20 @@ font-size:0.82rem;color:rgba(250,248,243,0.5);
 transition:color .3s;
 }
 .nav-logout:hover{color:var(--cream);}
+.nav-toggle{
+display:none;
+background:none;border:none;cursor:pointer;
+padding:0.4rem;margin-right:0.2rem;
+color:var(--cream);
+}
+.nav-toggle svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.sidebar-backdrop{
+display:none;
+position:fixed;inset:0;top:60px;
+background:rgba(22,33,26,0.45);
+z-index:49;
+}
+.sidebar-backdrop.open{display:block;}
 
 
 /* LAYOUT */
@@ -442,10 +450,40 @@ border-radius:var(--radius-sm);margin-bottom:0.8rem;
 .queue-board{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:760px){
-.sidebar{display:none;}
+.nav-toggle{display:flex;align-items:center;justify-content:center;}
+.nav-left{gap:0.8rem;}
+.nav-mark{font-size:1.2rem;}
+.nav-brand-sep{display:none;}
+.nav-label{display:none;}
+.sidebar{
+transform:translateX(-100%);
+transition:transform .3s ease;
+z-index:60;
+box-shadow:var(--shadow-lg);
+width:78vw;
+max-width:280px;
+}
+.sidebar.open{transform:translateX(0);}
 .admin-main{margin-left:0;padding:1.4rem 1.2rem;}
 .stats-row{grid-template-columns:1fr 1fr;}
+.mini-stats{grid-template-columns:1fr 1fr;}
 .queue-board{grid-template-columns:1fr;}
+.quick-actions{grid-template-columns:1fr;}
+.form-row-2,.form-row-3{grid-template-columns:1fr;}
+.section-toolbar{flex-direction:column;align-items:stretch;}
+.search-wrap{max-width:none;}
+.filter-bar{width:100%;}
+.card{padding:1.2rem;overflow-x:auto;}
+.admin-table{min-width:560px;}
+.modal-box{padding:1.6rem 1.4rem 1.4rem;}
+.page-header h1{font-size:1.5rem;}
+}
+@media(max-width:480px){
+.stats-row{grid-template-columns:1fr;}
+.mini-stats{grid-template-columns:1fr;}
+.admin-nav{padding:0.9rem 1rem;}
+.toast{left:1rem;right:1rem;transform:translateX(0) translateY(80px);white-space:normal;text-align:center;}
+.toast.show{transform:translateX(0) translateY(0);}
 }
 
 /* ===== SPLASH / PRELOADER ===== */
@@ -549,19 +587,20 @@ setTimeout(dismissPreloader, 800);
 <!-- NAV -->
 <nav class="admin-nav">
 <div class="nav-left">
+<button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
 <span class="nav-mark">Ever<em>well</em></span>
 <span class="nav-brand-sep"></span>
 <span class="nav-label" id="navRoleLabel">Billing Staff</span>
 </div>
 <div class="nav-right">
-<a href="homepage.html" class="nav-home">
-<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
-Home
-</a>
 <div class="nav-avatar" id="navAvatar" title="Billing Staff">BI</div>
 <a href="homepage.html" class="nav-logout">Log Out</a>
 </div>
 </nav>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
 <div class="admin-body">
 
@@ -921,8 +960,30 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     navigateTo(link.dataset.panel || 'dashboard', link.dataset.scroll);
+    closeMobileSidebar();
   });
 });
+
+/* MOBILE SIDEBAR DRAWER */
+const sidebarEl = document.getElementById('sidebar-billing');
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+const navToggle = document.getElementById('navToggle');
+function openMobileSidebar(){
+  sidebarEl.classList.add('open');
+  sidebarBackdrop.classList.add('open');
+  navToggle.setAttribute('aria-expanded', 'true');
+}
+function closeMobileSidebar(){
+  sidebarEl.classList.remove('open');
+  sidebarBackdrop.classList.remove('open');
+  navToggle.setAttribute('aria-expanded', 'false');
+}
+navToggle.addEventListener('click', () => {
+  sidebarEl.classList.contains('open') ? closeMobileSidebar() : openMobileSidebar();
+});
+sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileSidebar(); });
+window.addEventListener('resize', () => { if (window.innerWidth > 760) closeMobileSidebar(); });
 
 /* TOAST */
 function showToast(msg, type = 'success') {
