@@ -196,8 +196,8 @@ button{font-family:inherit;cursor:pointer;}
       <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     </button>
     <div class="user-chip">
-      <span class="avatar">MS</span>
-      <span class="u-meta"><span class="u-name">Maria Santos</span><span class="u-role">Patient</span></span>
+      <span class="avatar" id="userAvatar">MS</span>
+      <span class="u-meta"><span class="u-name" id="userName">Patient</span><span class="u-role">Patient</span></span>
     </div>
   </div>
 </nav>
@@ -357,8 +357,33 @@ button{font-family:inherit;cursor:pointer;}
   const sortFilter = document.getElementById('sortFilter');
   const confirmBanner = document.getElementById('confirmBanner');
   const confirmHospitalName = document.getElementById('confirmHospitalName');
+  const userNameEl = document.getElementById('userName');
+  const userAvatarEl = document.getElementById('userAvatar');
 
   let userLoc = null;
+
+  function getCurrentUser(){
+    try {
+      const stored = localStorage.getItem('everwell_current_user');
+      const session = sessionStorage.getItem('everwell_current_user');
+      return session ? JSON.parse(session) : (stored ? JSON.parse(stored) : null);
+    } catch {
+      return null;
+    }
+  }
+
+  function applyUserInfo(){
+    const user = getCurrentUser();
+    if (!user) return;
+    const firstName = String(user.name || '').trim().split(/\s+/)[0] || (user.email ? user.email.split('@')[0] : 'Patient');
+    const displayName = firstName
+      .split(/[-_\s]+/)
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join(' ');
+    if (userNameEl) userNameEl.textContent = displayName;
+    if (userAvatarEl) userAvatarEl.textContent = displayName.slice(0, 2).toUpperCase();
+  }
 
   function attachPressFeedback(){
     const selector = '.app-links a, .nav-mark, .icon-btn, .user-chip, .btn, .request-btn';
@@ -506,6 +531,8 @@ button{font-family:inherit;cursor:pointer;}
   });
 
   sortFilter.addEventListener('change', () => { if(userLoc) renderHospitals(); });
+
+  applyUserInfo();
 
   document.querySelectorAll('.reveal').forEach((el, index) => {
     requestAnimationFrame(() => {
