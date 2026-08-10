@@ -772,6 +772,27 @@ details[open] .record-summary{border-bottom:1px solid var(--line);}
   const referralCards = Array.from(document.querySelectorAll('.referral-card'));
   const referralEmpty = document.getElementById('referralEmpty');
 
+  // Read current user from sessionStorage then localStorage and apply to nav
+  function getCurrentUser(){
+    try{
+      const stored = localStorage.getItem('everwell_current_user');
+      const session = sessionStorage.getItem('everwell_current_user');
+      return session ? JSON.parse(session) : (stored ? JSON.parse(stored) : null);
+    }catch(e){ return null; }
+  }
+
+  function applyUserToNav(){
+    const user = getCurrentUser();
+    if(!user) return;
+    const fullName = String(user.name || user.fullName || user.displayName || '').trim();
+    const firstName = fullName.split(/\s+/)[0] || (user.email ? user.email.split('@')[0] : '');
+    const displayName = firstName.split(/[-_\s]+/).filter(Boolean).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+    const nameEl = document.querySelector('.user-chip .u-name');
+    const avatar = document.querySelector('.user-chip .avatar');
+    if(nameEl) nameEl.textContent = displayName;
+    if(avatar && displayName) avatar.textContent = displayName.slice(0,2).toUpperCase();
+  }
+
   function showPage(page){
     if(!pageViews[page]) page = 'records';
     Object.entries(pageViews).forEach(([key, view]) => { view.hidden = key !== page; });
@@ -782,6 +803,8 @@ details[open] .record-summary{border-bottom:1px solid var(--line);}
       else if(link.closest('.app-links')) link.removeAttribute('aria-current');
     });
     breadcrumbCurrent.textContent = pageNames[page];
+    // keep top-right user chip in sync when switching views
+    applyUserToNav();
     document.querySelector('.skip-link').setAttribute('href', page === 'referrals' ? '#referralsMain' : page === 'records' ? '#main' : `#${page}Page`);
   }
 
@@ -871,6 +894,8 @@ details[open] .record-summary{border-bottom:1px solid var(--line);}
 
   const initialPage = (window.location.hash || '').replace('#','');
   showPage(pageViews[initialPage] ? initialPage : 'records');
+  // apply current user to nav on initial load
+  applyUserToNav();
 })();
 </script>
 </body>
